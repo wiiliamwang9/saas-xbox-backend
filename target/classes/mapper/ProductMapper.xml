@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.saas.platform.mapper.ProductMapper">
+
+    <!-- 结果映射 -->
+    <resultMap id="BaseResultMap" type="com.saas.platform.entity.Product">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="product_name" property="productName" jdbcType="VARCHAR"/>
+        <result column="product_code" property="productCode" jdbcType="VARCHAR"/>
+        <result column="ip_quality" property="ipQuality" jdbcType="VARCHAR"/>
+        <result column="ip_count" property="ipCount" jdbcType="INTEGER"/>
+        <result column="duration_days" property="durationDays" jdbcType="INTEGER"/>
+        <result column="bandwidth_mbps" property="bandwidthMbps" jdbcType="INTEGER"/>
+        <result column="original_price" property="originalPrice" jdbcType="DECIMAL"/>
+        <result column="current_price" property="currentPrice" jdbcType="DECIMAL"/>
+        <result column="country_limit" property="countryLimit" jdbcType="VARCHAR" typeHandler="com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler"/>
+        <result column="product_status" property="productStatus" jdbcType="VARCHAR"/>
+        <result column="sort_order" property="sortOrder" jdbcType="INTEGER"/>
+        <result column="description" property="description" jdbcType="VARCHAR"/>
+        <result column="features" property="features" jdbcType="VARCHAR" typeHandler="com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler"/>
+        <result column="created_at" property="createdAt" jdbcType="TIMESTAMP"/>
+        <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP"/>
+        <result column="deleted_at" property="deletedAt" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!-- 基础列 -->
+    <sql id="Base_Column_List">
+        id, product_name, product_code, ip_quality, ip_count, duration_days, 
+        bandwidth_mbps, original_price, current_price, country_limit, 
+        product_status, sort_order, description, features, 
+        created_at, updated_at, deleted_at
+    </sql>
+
+    <!-- 分页查询产品列表 -->
+    <select id="selectProductPage" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM products
+        WHERE deleted_at IS NULL
+        <if test="productName != null and productName != ''">
+            AND product_name LIKE CONCAT('%', #{productName}, '%')
+        </if>
+        <if test="ipQuality != null and ipQuality != ''">
+            AND ip_quality = #{ipQuality}
+        </if>
+        <if test="productStatus != null and productStatus != ''">
+            AND product_status = #{productStatus}
+        </if>
+        ORDER BY sort_order ASC, created_at DESC
+    </select>
+
+    <!-- 根据产品编码查询产品 -->
+    <select id="selectByProductCode" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM products
+        WHERE product_code = #{productCode}
+        AND deleted_at IS NULL
+        LIMIT 1
+    </select>
+
+    <!-- 查询上架的产品列表 -->
+    <select id="selectOnlineProducts" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM products
+        WHERE product_status = '上架'
+        AND deleted_at IS NULL
+        ORDER BY sort_order ASC, created_at DESC
+    </select>
+
+    <!-- 根据IP质量查询产品列表 -->
+    <select id="selectByIpQuality" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM products
+        WHERE ip_quality = #{ipQuality}
+        AND deleted_at IS NULL
+        ORDER BY sort_order ASC, created_at DESC
+    </select>
+
+    <!-- 批量更新产品状态 -->
+    <update id="batchUpdateStatus">
+        UPDATE products
+        SET product_status = #{status}, updated_at = NOW()
+        WHERE id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        AND deleted_at IS NULL
+    </update>
+
+    <!-- 统计各状态产品数量 -->
+    <select id="countByStatus" resultType="java.util.Map">
+        SELECT 
+            product_status AS status,
+            COUNT(*) AS count
+        FROM products
+        WHERE deleted_at IS NULL
+        GROUP BY product_status
+        ORDER BY product_status
+    </select>
+
+</mapper>
