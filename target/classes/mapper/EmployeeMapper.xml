@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.saas.platform.mapper.EmployeeMapper">
+
+    <!-- 基础结果映射 -->
+    <resultMap id="BaseResultMap" type="com.saas.platform.entity.Employee">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="employee_no" property="employeeNo" jdbcType="VARCHAR"/>
+        <result column="username" property="username" jdbcType="VARCHAR"/>
+        <result column="password" property="password" jdbcType="VARCHAR"/>
+        <result column="real_name" property="realName" jdbcType="VARCHAR"/>
+        <result column="phone" property="phone" jdbcType="VARCHAR"/>
+        <result column="email" property="email" jdbcType="VARCHAR"/>
+        <result column="department_id" property="departmentId" jdbcType="BIGINT"/>
+        <result column="role" property="role" jdbcType="VARCHAR"/>
+        <result column="employee_status" property="employeeStatus" jdbcType="VARCHAR"/>
+        <result column="hire_date" property="hireDate" jdbcType="DATE"/>
+        <result column="avatar" property="avatar" jdbcType="VARCHAR"/>
+        <result column="last_login_time" property="lastLoginTime" jdbcType="TIMESTAMP"/>
+        <result column="last_login_ip" property="lastLoginIp" jdbcType="VARCHAR"/>
+        <result column="created_at" property="createdAt" jdbcType="TIMESTAMP"/>
+        <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP"/>
+        <result column="deleted_at" property="deletedAt" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!-- 基础列 -->
+    <sql id="Base_Column_List">
+        id, employee_no, username, password, real_name, phone, email, department_id, 
+        role, employee_status, hire_date, avatar, last_login_time, last_login_ip,
+        created_at, updated_at, deleted_at
+    </sql>
+
+    <!-- 根据用户名查询员工 -->
+    <select id="selectByUsername" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM employees
+        WHERE username = #{username}
+        AND deleted_at IS NULL
+    </select>
+
+    <!-- 根据员工号查询员工 -->
+    <select id="selectByEmployeeNo" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM employees
+        WHERE employee_no = #{employeeNo}
+        AND deleted_at IS NULL
+    </select>
+
+    <!-- 根据角色查询员工列表 -->
+    <select id="selectByRole" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM employees
+        WHERE role = #{role}
+        AND employee_status = '正常'
+        AND deleted_at IS NULL
+        ORDER BY created_at DESC
+    </select>
+
+    <!-- 根据部门ID查询员工列表 -->
+    <select id="selectByDepartmentId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM employees
+        WHERE department_id = #{departmentId}
+        AND employee_status = '正常'
+        AND deleted_at IS NULL
+        ORDER BY created_at DESC
+    </select>
+
+    <!-- 获取客户经理选项列表 -->
+    <select id="selectManagerOptions" resultMap="BaseResultMap">
+        SELECT id, employee_no, real_name, phone, email
+        FROM employees
+        WHERE role = '客户经理'
+        AND employee_status = '正常'
+        AND deleted_at IS NULL
+        ORDER BY real_name ASC
+    </select>
+
+</mapper>

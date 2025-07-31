@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.saas.platform.mapper.IntentionCustomerMapper">
+
+    <!-- 基础结果映射 -->
+    <resultMap id="BaseResultMap" type="com.saas.platform.entity.IntentionCustomer">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="customer_name" property="customerName" jdbcType="VARCHAR"/>
+        <result column="customer_source" property="customerSource" jdbcType="VARCHAR"/>
+        <result column="customer_type" property="customerType" jdbcType="VARCHAR"/>
+        <result column="phone" property="phone" jdbcType="VARCHAR"/>
+        <result column="wechat" property="wechat" jdbcType="VARCHAR"/>
+        <result column="email" property="email" jdbcType="VARCHAR"/>
+        <result column="company_name" property="companyName" jdbcType="VARCHAR"/>
+        <result column="manager_id" property="managerId" jdbcType="BIGINT"/>
+        <result column="intention_level" property="intentionLevel" jdbcType="VARCHAR"/>
+        <result column="related_accounts" property="relatedAccounts" jdbcType="VARCHAR"
+                typeHandler="com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler"/>
+        <result column="is_deal" property="isDeal" jdbcType="BOOLEAN"/>
+        <result column="discount" property="discount" jdbcType="DECIMAL"/>
+        <result column="remark" property="remark" jdbcType="VARCHAR"/>
+        <result column="follow_up_time" property="followUpTime" jdbcType="TIMESTAMP"/>
+        <result column="last_contact_time" property="lastContactTime" jdbcType="TIMESTAMP"/>
+        <result column="created_at" property="createdAt" jdbcType="TIMESTAMP"/>
+        <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP"/>
+        <result column="deleted_at" property="deletedAt" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!-- 扩展结果映射（包含关联信息） -->
+    <resultMap id="ExtendResultMap" type="com.saas.platform.entity.IntentionCustomer" extends="BaseResultMap">
+        <result column="manager_name" property="managerName" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!-- 基础列 -->
+    <sql id="Base_Column_List">
+        ic.id, ic.customer_name, ic.customer_source, ic.customer_type, ic.phone, ic.wechat, 
+        ic.email, ic.company_name, ic.manager_id, ic.intention_level, ic.related_accounts, 
+        ic.is_deal, ic.discount, ic.remark, ic.follow_up_time, ic.last_contact_time,
+        ic.created_at, ic.updated_at, ic.deleted_at
+    </sql>
+
+    <!-- 分页查询意向客户列表 -->
+    <select id="selectPageWithConditions" resultType="com.saas.platform.entity.IntentionCustomer">
+        SELECT 
+            <include refid="Base_Column_List"/>,
+            e.real_name AS manager_name
+        FROM intention_customers ic
+        LEFT JOIN employees e ON ic.manager_id = e.id AND e.deleted_at IS NULL
+        <where>
+            ic.deleted_at IS NULL
+            <if test="customerName != null and customerName != ''">
+                AND ic.customer_name LIKE CONCAT('%', #{customerName}, '%')
+            </if>
+            <if test="customerSource != null and customerSource != ''">
+                AND ic.customer_source = #{customerSource}
+            </if>
+            <if test="intentionLevel != null and intentionLevel != ''">
+                AND ic.intention_level = #{intentionLevel}
+            </if>
+            <if test="managerId != null">
+                AND ic.manager_id = #{managerId}
+            </if>
+            <if test="isDeal != null">
+                AND ic.is_deal = #{isDeal}
+            </if>
+            <if test="startTime != null">
+                AND ic.created_at &gt;= #{startTime}
+            </if>
+            <if test="endTime != null">
+                AND ic.created_at &lt;= #{endTime}
+            </if>
+        </where>
+        ORDER BY ic.created_at DESC
+    </select>
+
+    <!-- 根据手机号查询意向客户 -->
+    <select id="selectByPhone" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM intention_customers ic
+        WHERE ic.phone = #{phone}
+        AND ic.deleted_at IS NULL
+    </select>
+
+    <!-- 根据客户经理ID查询意向客户列表 -->
+    <select id="selectByManagerId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM intention_customers ic
+        WHERE ic.manager_id = #{managerId}
+        AND ic.deleted_at IS NULL
+        ORDER BY ic.created_at DESC
+    </select>
+
+    <!-- 统计各意向级别的客户数量 -->
+    <select id="countByIntentionLevel" resultType="java.util.Map">
+        SELECT 
+            intention_level AS intentionLevel,
+            COUNT(*) AS count
+        FROM intention_customers
+        <where>
+            deleted_at IS NULL
+            <if test="managerId != null">
+                AND manager_id = #{managerId}
+            </if>
+        </where>
+        GROUP BY intention_level
+        ORDER BY 
+            CASE intention_level
+                WHEN '潜在客户' THEN 1
+                WHEN '意向客户' THEN 2
+                WHEN '准客户' THEN 3
+                WHEN '签约客户' THEN 4
+                ELSE 5
+            END
+    </select>
+
+    <!-- 查询需要跟进的客户列表 -->
+    <select id="selectFollowUpList" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM intention_customers ic
+        <where>
+            ic.deleted_at IS NULL
+            AND ic.follow_up_time IS NOT NULL
+            AND ic.follow_up_time &lt;= #{currentTime}
+            AND ic.is_deal = false
+            <if test="managerId != null">
+                AND ic.manager_id = #{managerId}
+            </if>
+        </where>
+        ORDER BY ic.follow_up_time ASC
+    </select>
+
+</mapper>
