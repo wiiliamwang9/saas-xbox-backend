@@ -23,13 +23,12 @@ public interface NodeService extends IService<Node> {
      * @param size 每页大小
      * @param nodeName 节点名称
      * @param country 国家
-     * @param city 城市
      * @param nodeType 节点类型
      * @param nodeStatus 节点状态
      * @return 分页结果
      */
     IPage<Node> getNodePage(Long current, Long size, String nodeName, String country,
-                           String city, String nodeType, String nodeStatus);
+                           String nodeType, String nodeStatus);
 
     /**
      * 根据节点编码查询节点
@@ -263,4 +262,20 @@ public interface NodeService extends IService<Node> {
      * @return 优化建议
      */
     List<String> getOptimizationSuggestions(Long nodeId);
+
+    /**
+     * 部署Agent
+     * 
+     * @param nodeId 节点ID
+     * @return 是否成功
+     */
+    boolean deployAgent(Long nodeId);
+
+    /**
+     * 删除Agent
+     * 
+     * @param nodeId 节点ID
+     * @return 是否成功
+     */
+    boolean deleteAgent(Long nodeId);
 }

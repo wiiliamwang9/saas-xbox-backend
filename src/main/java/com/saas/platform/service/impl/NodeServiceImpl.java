@@ -8,6 +8,7 @@ import com.saas.platform.entity.Node;
 import com.saas.platform.exception.BusinessException;
 import com.saas.platform.mapper.NodeMapper;
 import com.saas.platform.service.NodeService;
+import com.saas.platform.util.IpLocationUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -27,12 +28,18 @@ import java.util.stream.Collectors;
  */
 @Service
 public class NodeServiceImpl extends ServiceImpl<NodeMapper, Node> implements NodeService {
+    
+    private final IpLocationUtil ipLocationUtil;
+    
+    public NodeServiceImpl(IpLocationUtil ipLocationUtil) {
+        this.ipLocationUtil = ipLocationUtil;
+    }
 
     @Override
     public IPage<Node> getNodePage(Long current, Long size, String nodeName, String country,
-                                 String city, String nodeType, String nodeStatus) {
+                                 String nodeType, String nodeStatus) {
         Page<Node> page = new Page<>(current, size);
-        return baseMapper.selectNodePage(page, nodeName, country, city, nodeType, nodeStatus);
+        return baseMapper.selectNodePage(page, nodeName, country, nodeType, nodeStatus);
     }
 
     @Override
@@ -85,6 +92,13 @@ public class NodeServiceImpl extends ServiceImpl<NodeMapper, Node> implements No
             throw new BusinessException("服务器IP已存在");
         }
         
+        // 根据IP自动获取地理位置信息
+        if (StringUtils.hasText(node.getServerIp())) {
+            IpLocationUtil.LocationInfo locationInfo = ipLocationUtil.getLocationByIp(node.getServerIp());
+            node.setCountry(locationInfo.getCountry());
+            node.setRegion(locationInfo.getRegion());
+        }
+        
         // 设置默认值
         if (!StringUtils.hasText(node.getNodeStatus())) {
             node.setNodeStatus("停用");
@@ -125,6 +139,15 @@ public class NodeServiceImpl extends ServiceImpl<NodeMapper, Node> implements No
         // 验证服务器IP唯一性
         if (!isServerIpUnique(node.getServerIp(), node.getId())) {
             throw new BusinessException("服务器IP已存在");
+        }
+        
+        // 如果IP地址发生变化，重新获取地理位置信息
+        if (!existNode.getServerIp().equals(node.getServerIp())) {
+            if (StringUtils.hasText(node.getServerIp())) {
+                IpLocationUtil.LocationInfo locationInfo = ipLocationUtil.getLocationByIp(node.getServerIp());
+                node.setCountry(locationInfo.getCountry());
+                node.setRegion(locationInfo.getRegion());
+            }
         }
         
         return updateById(node);
@@ -580,5 +603,76 @@ public class NodeServiceImpl extends ServiceImpl<NodeMapper, Node> implements No
         }
         
         return suggestions;
+    }
+
+    @Override
+    @Transactional
+    public boolean deployAgent(Long nodeId) {
+        Node node = getById(nodeId);
+        if (node == null) {
+            throw new BusinessException("节点不存在");
+        }
+        
+        if ("已部署".equals(node.getAgentStatus())) {
+            throw new BusinessException("Agent已部署，无需重复部署");
+        }
+        
+        try {
+            // 设置部署中状态
+            node.setAgentStatus("部署中");
+            updateById(node);
+            
+            // TODO: 实际的Agent部署逻辑
+            // 1. SSH连接到节点
+            // 2. 下载Agent程序
+            // 3. 安装并启动Agent
+            // 4. 验证Agent状态
+            
+            // 模拟部署过程
+            Thread.sleep(2000);
+            
+            // 更新为已部署状态
+            node.setAgentStatus("已部署");
+            updateById(node);
+            
+            return true;
+        } catch (Exception e) {
+            // 部署失败，恢复为未部署状态
+            node.setAgentStatus("未部署");
+            updateById(node);
+            throw new BusinessException("Agent部署失败: " + e.getMessage());
+        }
+    }
+
+    @Override
+    @Transactional
+    public boolean deleteAgent(Long nodeId) {
+        Node node = getById(nodeId);
+        if (node == null) {
+            throw new BusinessException("节点不存在");
+        }
+        
+        if ("未部署".equals(node.getAgentStatus())) {
+            throw new BusinessException("Agent未部署，无需删除");
+        }
+        
+        try {
+            // TODO: 实际的Agent删除逻辑
+            // 1. SSH连接到节点
+            // 2. 停止Agent服务
+            // 3. 删除Agent程序文件
+            // 4. 清理相关配置
+            
+            // 模拟删除过程
+            Thread.sleep(1000);
+            
+            // 更新为未部署状态
+            node.setAgentStatus("未部署");
+            updateById(node);
+            
+            return true;
+        } catch (Exception e) {
+            throw new BusinessException("Agent删除失败: " + e.getMessage());
+        }
     }
 }

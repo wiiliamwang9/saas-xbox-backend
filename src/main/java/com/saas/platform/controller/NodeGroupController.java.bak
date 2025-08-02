@@ -1,0 +1,200 @@
+package com.saas.platform.controller;
+
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.saas.platform.dto.Result;
+import com.saas.platform.entity.NodeGroup;
+import com.saas.platform.entity.Node;
+import com.saas.platform.service.NodeGroupService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import java.util.List;
+
+/**
+ * 节点组管理控制器
+ * 
+ * @author SaaS Xbox Team
+ * @since 2024-07-31
+ */
+@Tag(name = "节点组管理", description = "节点组管理相关接口")
+@RestController
+@RequestMapping("/api/node-groups")
+@Validated
+public class NodeGroupController {
+
+    @Autowired
+    private NodeGroupService nodeGroupService;
+
+    /**
+     * 分页查询节点组列表
+     */
+    @Operation(summary = "分页查询节点组列表", description = "支持按节点组名称、节点组类型、国家/地区筛选")
+    @GetMapping("/page")
+    public Result<IPage<NodeGroup>> getNodeGroupPage(
+            @Parameter(description = "当前页", example = "1") @RequestParam(defaultValue = "1") Long current,
+            @Parameter(description = "每页大小", example = "10") @RequestParam(defaultValue = "10") Long size,
+            @Parameter(description = "节点组名称") @RequestParam(required = false) String groupName,
+            @Parameter(description = "节点组类型") @RequestParam(required = false) String groupType,
+            @Parameter(description = "国家") @RequestParam(required = false) String country,
+            @Parameter(description = "地区") @RequestParam(required = false) String region) {
+        IPage<NodeGroup> page = nodeGroupService.getNodeGroupPage(current, size, groupName, groupType, country, region);
+        return Result.success(page);
+    }
+
+    /**
+     * 根据ID查询节点组详情
+     */
+    @Operation(summary = "查询节点组详情", description = "根据节点组ID获取详细信息")
+    @GetMapping("/{id}")
+    public Result<NodeGroup> getNodeGroupById(
+            @Parameter(description = "节点组ID", example = "1") @PathVariable @NotNull Long id) {
+        NodeGroup nodeGroup = nodeGroupService.getById(id);
+        if (nodeGroup == null) {
+            return Result.error("节点组不存在");
+        }
+        return Result.success(nodeGroup);
+    }
+
+    /**
+     * 创建节点组
+     */
+    @Operation(summary = "创建节点组", description = "新增节点组信息")
+    @PostMapping
+    public Result<Boolean> createNodeGroup(@Valid @RequestBody NodeGroup nodeGroup) {
+        // 验证节点组名称唯一性
+        if (!nodeGroupService.isGroupNameUnique(nodeGroup.getGroupName(), null)) {
+            return Result.error("节点组名称已存在");
+        }
+
+        boolean success = nodeGroupService.createNodeGroup(nodeGroup);
+        if (success) {
+            return Result.success("节点组创建成功", true);
+        } else {
+            return Result.error("节点组创建失败");
+        }
+    }
+
+    /**
+     * 更新节点组信息
+     */
+    @Operation(summary = "更新节点组信息", description = "修改节点组信息")
+    @PutMapping("/{id}")
+    public Result<Boolean> updateNodeGroup(
+            @Parameter(description = "节点组ID", example = "1") @PathVariable @NotNull Long id,
+            @Valid @RequestBody NodeGroup nodeGroup) {
+        
+        // 验证节点组是否存在
+        NodeGroup existingNodeGroup = nodeGroupService.getById(id);
+        if (existingNodeGroup == null) {
+            return Result.error("节点组不存在");
+        }
+
+        // 验证节点组名称唯一性（排除当前节点组）
+        if (!nodeGroupService.isGroupNameUnique(nodeGroup.getGroupName(), id)) {
+            return Result.error("节点组名称已存在");
+        }
+
+        nodeGroup.setId(id);
+        boolean success = nodeGroupService.updateNodeGroup(nodeGroup);
+        if (success) {
+            return Result.success("节点组更新成功", true);
+        } else {
+            return Result.error("节点组更新失败");
+        }
+    }
+
+    /**
+     * 删除节点组
+     */
+    @Operation(summary = "删除节点组", description = "根据ID删除节点组")
+    @DeleteMapping("/{id}")
+    public Result<Boolean> deleteNodeGroup(
+            @Parameter(description = "节点组ID", example = "1") @PathVariable @NotNull Long id) {
+        
+        // 验证节点组是否存在
+        NodeGroup existingNodeGroup = nodeGroupService.getById(id);
+        if (existingNodeGroup == null) {
+            return Result.error("节点组不存在");
+        }
+
+        boolean success = nodeGroupService.deleteNodeGroup(id);
+        if (success) {
+            return Result.success("节点组删除成功", true);
+        } else {
+            return Result.error("节点组删除失败");
+        }
+    }
+
+    /**
+     * 获取节点组成员列表
+     */
+    @Operation(summary = "获取节点组成员列表", description = "获取指定节点组的成员节点列表")
+    @GetMapping("/{id}/members")
+    public Result<List<Node>> getNodeGroupMembers(
+            @Parameter(description = "节点组ID", example = "1") @PathVariable @NotNull Long id) {
+        List<Node> members = nodeGroupService.getNodeGroupMembers(id);
+        return Result.success(members);
+    }
+
+    /**
+     * 添加节点组成员
+     */
+    @Operation(summary = "添加节点组成员", description = "向节点组添加成员节点")
+    @PostMapping("/{id}/members")
+    public Result<Boolean> addNodeGroupMembers(
+            @Parameter(description = "节点组ID", example = "1") @PathVariable @NotNull Long id,
+            @Parameter(description = "节点ID列表") @RequestBody @NotEmpty List<Long> nodeIds) {
+        
+        // 验证节点组是否存在
+        NodeGroup existingNodeGroup = nodeGroupService.getById(id);
+        if (existingNodeGroup == null) {
+            return Result.error("节点组不存在");
+        }
+
+        boolean success = nodeGroupService.addNodeGroupMembers(id, nodeIds);
+        if (success) {
+            return Result.success("节点组成员添加成功", true);
+        } else {
+            return Result.error("节点组成员添加失败");
+        }
+    }
+
+    /**
+     * 移除节点组成员
+     */
+    @Operation(summary = "移除节点组成员", description = "从节点组移除成员节点")
+    @DeleteMapping("/{id}/members")
+    public Result<Boolean> removeNodeGroupMembers(
+            @Parameter(description = "节点组ID", example = "1") @PathVariable @NotNull Long id,
+            @Parameter(description = "节点ID列表") @RequestBody @NotEmpty List<Long> nodeIds) {
+        
+        boolean success = nodeGroupService.removeNodeGroupMembers(id, nodeIds);
+        if (success) {
+            return Result.success("节点组成员移除成功", true);
+        } else {
+            return Result.error("节点组成员移除失败");
+        }
+    }
+
+    /**
+     * 获取可选择的节点列表
+     */
+    @Operation(summary = "获取可选择的节点列表", description = "根据节点组类型获取可选择的节点列表")
+    @GetMapping("/available-nodes")
+    public Result<List<Node>> getAvailableNodes(
+            @Parameter(description = "节点组类型") @RequestParam String groupType,
+            @Parameter(description = "节点组ID（编辑时排除已选节点）", required = false) @RequestParam(required = false) Long groupId,
+            @Parameter(description = "国家", required = false) @RequestParam(required = false) String country,
+            @Parameter(description = "地区", required = false) @RequestParam(required = false) String region,
+            @Parameter(description = "节点名称", required = false) @RequestParam(required = false) String nodeName) {
+        List<Node> nodes = nodeGroupService.getAvailableNodes(groupType, groupId, country, region, nodeName);
+        return Result.success(nodes);
+    }
+}

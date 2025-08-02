@@ -3,6 +3,7 @@
 /root/wl/code/saas-xbox-backend/src/main/java/com/saas/platform/config/MyBatisPlusConfig.java
 /root/wl/code/saas-xbox-backend/src/main/java/com/saas/platform/config/RestTemplateConfig.java
 /root/wl/code/saas-xbox-backend/src/main/java/com/saas/platform/config/ScheduleConfig.java
+/root/wl/code/saas-xbox-backend/src/main/java/com/saas/platform/config/SecurityConfig.java
 /root/wl/code/saas-xbox-backend/src/main/java/com/saas/platform/config/SwaggerConfig.java
 /root/wl/code/saas-xbox-backend/src/main/java/com/saas/platform/controller/CustomerController.java
 /root/wl/code/saas-xbox-backend/src/main/java/com/saas/platform/controller/EmployeeController.java
@@ -27,6 +28,8 @@
 /root/wl/code/saas-xbox-backend/src/main/java/com/saas/platform/entity/IntentionCustomer.java
 /root/wl/code/saas-xbox-backend/src/main/java/com/saas/platform/entity/IpPool.java
 /root/wl/code/saas-xbox-backend/src/main/java/com/saas/platform/entity/Node.java
+/root/wl/code/saas-xbox-backend/src/main/java/com/saas/platform/entity/NodeGroup.java
+/root/wl/code/saas-xbox-backend/src/main/java/com/saas/platform/entity/NodeGroupMember.java
 /root/wl/code/saas-xbox-backend/src/main/java/com/saas/platform/entity/Order.java
 /root/wl/code/saas-xbox-backend/src/main/java/com/saas/platform/entity/Product.java
 /root/wl/code/saas-xbox-backend/src/main/java/com/saas/platform/exception/BusinessException.java
@@ -43,6 +46,7 @@
 /root/wl/code/saas-xbox-backend/src/main/java/com/saas/platform/service/EmployeeService.java
 /root/wl/code/saas-xbox-backend/src/main/java/com/saas/platform/service/IntentionCustomerService.java
 /root/wl/code/saas-xbox-backend/src/main/java/com/saas/platform/service/IpPoolService.java
+/root/wl/code/saas-xbox-backend/src/main/java/com/saas/platform/service/NodeGroupService.java
 /root/wl/code/saas-xbox-backend/src/main/java/com/saas/platform/service/NodeService.java
 /root/wl/code/saas-xbox-backend/src/main/java/com/saas/platform/service/OrderService.java
 /root/wl/code/saas-xbox-backend/src/main/java/com/saas/platform/service/ProductService.java
@@ -55,3 +59,4 @@
 /root/wl/code/saas-xbox-backend/src/main/java/com/saas/platform/service/impl/OrderServiceImpl.java
 /root/wl/code/saas-xbox-backend/src/main/java/com/saas/platform/service/impl/ProductServiceImpl.java
 /root/wl/code/saas-xbox-backend/src/main/java/com/saas/platform/service/impl/XboxSyncServiceImpl.java
+/root/wl/code/saas-xbox-backend/src/main/java/com/saas/platform/util/IpLocationUtil.java

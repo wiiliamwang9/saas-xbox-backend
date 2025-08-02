@@ -53,7 +53,6 @@ public class Node extends BaseEntity {
      */
     @Schema(description = "国家", example = "美国")
     @TableField("country")
-    @NotBlank(message = "国家不能为空")
     @Size(max = 50, message = "国家长度不能超过50个字符")
     private String country;
 
@@ -65,21 +64,63 @@ public class Node extends BaseEntity {
     @Size(max = 50, message = "地区长度不能超过50个字符")
     private String region;
 
+
     /**
-     * 城市
+     * SSH端口号
      */
-    @Schema(description = "城市", example = "洛杉矶")
-    @TableField("city")
-    @Size(max = 50, message = "城市长度不能超过50个字符")
-    private String city;
+    @Schema(description = "SSH端口号", example = "22")
+    @TableField("ssh_port")
+    @NotNull(message = "SSH端口号不能为空")
+    @Min(value = 1, message = "SSH端口号必须大于0")
+    @Max(value = 65535, message = "SSH端口号不能超过65535")
+    private Integer sshPort = 22;
+
+    /**
+     * 密码
+     */
+    @Schema(description = "密码")
+    @TableField("password")
+    @NotBlank(message = "密码不能为空")
+    @Size(min = 8, max = 64, message = "密码长度必须在8-64个字符之间")
+    private String password;
+
+    /**
+     * 域名
+     */
+    @Schema(description = "域名", example = "node1.example.com")
+    @TableField("domain")
+    @Size(max = 255, message = "域名长度不能超过255个字符")
+    private String domain;
 
     /**
      * 节点类型
      */
-    @Schema(description = "节点类型", example = "物理节点", allowableValues = {"物理节点", "虚拟节点"})
+    @Schema(description = "节点类型", example = "完整节点", allowableValues = {"完整节点", "转发节点", "解密节点"})
     @TableField("node_type")
     @NotBlank(message = "节点类型不能为空")
     private String nodeType;
+
+    /**
+     * 组合方式（仅完整节点有效）
+     */
+    @Schema(description = "组合方式", example = "独立节点", allowableValues = {"独立节点", "组合节点", "落地节点"})
+    @TableField("combination_type")
+    private String combinationType;
+
+    /**
+     * 备注
+     */
+    @Schema(description = "备注")
+    @TableField("remark")
+    @Size(max = 200, message = "备注长度不能超过200个字符")
+    private String remark;
+
+    /**
+     * Agent部署状态
+     */
+    @Schema(description = "Agent部署状态", example = "未部署", allowableValues = {"已部署", "未部署", "部署中"})
+    @TableField("agent_status")
+    private String agentStatus = "未部署";
 
     /**
      * 节点状态
@@ -216,13 +257,6 @@ public class Node extends BaseEntity {
         this.region = region;
     }
 
-    public String getCity() {
-        return city;
-    }
-
-    public void setCity(String city) {
-        this.city = city;
-    }
 
     public String getNodeType() {
         return nodeType;
@@ -320,16 +354,69 @@ public class Node extends BaseEntity {
         this.monthlyCost = monthlyCost;
     }
 
+    public Integer getSshPort() {
+        return sshPort;
+    }
+
+    public void setSshPort(Integer sshPort) {
+        this.sshPort = sshPort;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getDomain() {
+        return domain;
+    }
+
+    public void setDomain(String domain) {
+        this.domain = domain;
+    }
+
+    public String getCombinationType() {
+        return combinationType;
+    }
+
+    public void setCombinationType(String combinationType) {
+        this.combinationType = combinationType;
+    }
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
+    }
+
+    public String getAgentStatus() {
+        return agentStatus;
+    }
+
+    public void setAgentStatus(String agentStatus) {
+        this.agentStatus = agentStatus;
+    }
+
     @Override
     public String toString() {
         return "Node{" +
                 "nodeName='" + nodeName + '\'' +
                 ", nodeCode='" + nodeCode + '\'' +
                 ", serverIp='" + serverIp + '\'' +
+                ", sshPort=" + sshPort +
+                ", password='" + "[HIDDEN]" + '\'' +
+                ", domain='" + domain + '\'' +
                 ", country='" + country + '\'' +
                 ", region='" + region + '\'' +
-                ", city='" + city + '\'' +
                 ", nodeType='" + nodeType + '\'' +
+                ", combinationType='" + combinationType + '\'' +
+                ", remark='" + remark + '\'' +
+                ", agentStatus='" + agentStatus + '\'' +
                 ", nodeStatus='" + nodeStatus + '\'' +
                 ", maxConnections=" + maxConnections +
                 ", currentConnections=" + currentConnections +

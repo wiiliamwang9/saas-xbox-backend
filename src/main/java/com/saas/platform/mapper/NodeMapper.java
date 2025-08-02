@@ -25,7 +25,6 @@ public interface NodeMapper extends BaseMapper<Node> {
      * @param page 分页对象
      * @param nodeName 节点名称
      * @param country 国家
-     * @param city 城市
      * @param nodeType 节点类型
      * @param nodeStatus 节点状态
      * @return 分页结果
@@ -33,7 +32,6 @@ public interface NodeMapper extends BaseMapper<Node> {
     IPage<Node> selectNodePage(Page<Node> page,
                               @Param("nodeName") String nodeName,
                               @Param("country") String country,
-                              @Param("city") String city,
                               @Param("nodeType") String nodeType,
                               @Param("nodeStatus") String nodeStatus);
 

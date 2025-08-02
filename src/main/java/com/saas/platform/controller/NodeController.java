@@ -26,7 +26,7 @@ import java.util.Map;
  */
 @Tag(name = "节点管理", description = "节点管理相关接口")
 @RestController
-@RequestMapping("/api/nodes")
+@RequestMapping("/nodes")
 @Validated
 public class NodeController {
 
@@ -43,10 +43,9 @@ public class NodeController {
             @Parameter(description = "每页大小", example = "10") @RequestParam(defaultValue = "10") Long size,
             @Parameter(description = "节点名称") @RequestParam(required = false) String nodeName,
             @Parameter(description = "国家") @RequestParam(required = false) String country,
-            @Parameter(description = "城市") @RequestParam(required = false) String city,
             @Parameter(description = "节点类型") @RequestParam(required = false) String nodeType,
             @Parameter(description = "节点状态") @RequestParam(required = false) String nodeStatus) {
-        IPage<Node> page = nodeService.getNodePage(current, size, nodeName, country, city, nodeType, nodeStatus);
+        IPage<Node> page = nodeService.getNodePage(current, size, nodeName, country, nodeType, nodeStatus);
         return Result.success(page);
     }
 
@@ -387,5 +386,49 @@ public class NodeController {
             @Parameter(description = "节点ID", example = "1") @PathVariable @NotNull Long id) {
         List<String> suggestions = nodeService.getOptimizationSuggestions(id);
         return Result.success(suggestions);
+    }
+
+    /**
+     * 部署Agent
+     */
+    @Operation(summary = "部署Agent", description = "在指定节点上部署Agent")
+    @PostMapping("/{id}/deploy-agent")
+    public Result<Boolean> deployAgent(
+            @Parameter(description = "节点ID", example = "1") @PathVariable @NotNull Long id) {
+        
+        // 验证节点是否存在
+        Node existingNode = nodeService.getById(id);
+        if (existingNode == null) {
+            return Result.error("节点不存在");
+        }
+
+        boolean success = nodeService.deployAgent(id);
+        if (success) {
+            return Result.success("Agent部署成功", true);
+        } else {
+            return Result.error("Agent部署失败");
+        }
+    }
+
+    /**
+     * 删除Agent
+     */
+    @Operation(summary = "删除Agent", description = "从指定节点删除Agent")
+    @PostMapping("/{id}/delete-agent")
+    public Result<Boolean> deleteAgent(
+            @Parameter(description = "节点ID", example = "1") @PathVariable @NotNull Long id) {
+        
+        // 验证节点是否存在
+        Node existingNode = nodeService.getById(id);
+        if (existingNode == null) {
+            return Result.error("节点不存在");
+        }
+
+        boolean success = nodeService.deleteAgent(id);
+        if (success) {
+            return Result.success("Agent删除成功", true);
+        } else {
+            return Result.error("Agent删除失败");
+        }
     }
 }

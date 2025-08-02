@@ -282,13 +282,12 @@ public class XboxSyncServiceImpl implements XboxSyncService {
         if (metadata != null) {
             node.setCountry("未知"); // 默认值，可以根据实际情况修改
             node.setRegion("未知");
-            node.setCity("未知");
             
-            // 从metadata中提取更多信息
+            // 从metadata中提取更多信息 - city字段已删除
             if (metadata.containsKey("location")) {
-                // 如果有位置信息
+                // 如果有位置信息，可以设置到region字段
                 String location = metadata.getString("location");
-                node.setCity(location);
+                node.setRegion(location);
             }
         }
         

@@ -3,10 +3,12 @@ com/saas/platform/service/impl/OrderServiceImpl.class
 com/saas/platform/entity/Employee.class
 com/saas/platform/mapper/ProductMapper.class
 com/saas/platform/dto/IntentionCustomerQuery.class
+com/saas/platform/config/SecurityConfig.class
 com/saas/platform/service/IntentionCustomerService.class
 com/saas/platform/service/NodeService.class
 com/saas/platform/entity/BaseEntity.class
 com/saas/platform/dto/CustomerDTO.class
+com/saas/platform/util/IpLocationUtil.class
 com/saas/platform/service/impl/NodeServiceImpl.class
 com/saas/platform/controller/OrderController.class
 com/saas/platform/service/impl/CustomerServiceImpl.class
@@ -36,6 +38,7 @@ com/saas/platform/dto/TimeRangeQuery.class
 com/saas/platform/controller/EmployeeController.class
 com/saas/platform/entity/IpPool.class
 com/saas/platform/mapper/IpPoolMapper.class
+com/saas/platform/service/NodeGroupService.class
 com/saas/platform/config/SwaggerConfig.class
 com/saas/platform/dto/PageQuery.class
 com/saas/platform/service/impl/XboxSyncServiceImpl.class
@@ -49,10 +52,13 @@ com/saas/platform/config/CacheConfig.class
 com/saas/platform/entity/Product.class
 com/saas/platform/SaasxboxbackendApplication.class
 com/saas/platform/controller/IntentionCustomerController.class
+com/saas/platform/util/IpLocationUtil$LocationInfo.class
 com/saas/platform/service/OrderService.class
 com/saas/platform/mapper/EmployeeMapper.class
 com/saas/platform/service/CustomerService.class
 com/saas/platform/config/MyBatisPlusConfig$1.class
 com/saas/platform/entity/Order.class
 com/saas/platform/mapper/CustomerMapper.class
+com/saas/platform/entity/NodeGroupMember.class
 com/saas/platform/exception/GlobalExceptionHandler.class
+com/saas/platform/entity/NodeGroup.class
