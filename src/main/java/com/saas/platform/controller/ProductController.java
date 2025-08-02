@@ -25,7 +25,7 @@ import java.util.Map;
  */
 @Tag(name = "产品管理", description = "产品管理相关接口")
 @RestController
-@RequestMapping("/api/products")
+@RequestMapping("/products")
 @Validated
 public class ProductController {
 

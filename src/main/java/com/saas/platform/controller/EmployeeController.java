@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
  */
 @Tag(name = "员工管理", description = "员工管理相关接口")
 @RestController
-@RequestMapping("/api/employees")
+@RequestMapping("/employees")
 @Validated
 public class EmployeeController {
 
