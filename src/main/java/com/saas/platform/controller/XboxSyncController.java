@@ -115,4 +115,85 @@ public class XboxSyncController {
             return Result.error("强制同步失败: " + e.getMessage());
         }
     }
+
+    @Operation(summary = "部署Agent到远程节点", description = "通过Xbox Controller部署Agent到指定远程节点")
+    @PostMapping("/deploy-agent")
+    public Result<String> deployAgent(
+            @Parameter(description = "节点IP地址", required = true)
+            @RequestParam String nodeIp,
+            @Parameter(description = "SSH端口", required = false)
+            @RequestParam(defaultValue = "22") Integer sshPort,
+            @Parameter(description = "SSH用户名", required = false)
+            @RequestParam(defaultValue = "root") String sshUser,
+            @Parameter(description = "SSH密码", required = true)
+            @RequestParam String sshPassword) {
+        
+        log.info("开始部署Agent到节点: {}:{}", nodeIp, sshPort);
+        
+        try {
+            // 这里调用Controller的部署API或执行部署脚本
+            String deployResult = xboxSyncService.deployAgentToNode(nodeIp, sshPort, sshUser, sshPassword);
+            return Result.success(deployResult);
+        } catch (Exception e) {
+            log.error("部署Agent失败", e);
+            return Result.error("部署失败: " + e.getMessage());
+        }
+    }
+
+    @Operation(summary = "更新Agent配置", description = "更新指定Agent的sing-box配置，包括黑白名单规则")
+    @PostMapping("/update-agent-config")
+    public Result<String> updateAgentConfig(
+            @Parameter(description = "Agent ID", required = true)
+            @RequestParam String agentId,
+            @Parameter(description = "配置类型 (blacklist/whitelist/protocols)", required = true)
+            @RequestParam String configType,
+            @Parameter(description = "配置内容(JSON格式)", required = true)
+            @RequestBody String configContent) {
+        
+        log.info("更新Agent配置: {} - {}", agentId, configType);
+        
+        try {
+            String updateResult = xboxSyncService.updateAgentConfig(agentId, configType, configContent);
+            return Result.success(updateResult);
+        } catch (Exception e) {
+            log.error("更新Agent配置失败", e);
+            return Result.error("配置更新失败: " + e.getMessage());
+        }
+    }
+
+    @Operation(summary = "获取Agent系统监控信息", description = "获取指定Agent的CPU、内存、网络等监控信息")
+    @GetMapping("/agent-monitoring/{agentId}")
+    public Result<Object> getAgentMonitoring(
+            @Parameter(description = "Agent ID", required = true)
+            @PathVariable String agentId) {
+        
+        log.info("获取Agent监控信息: {}", agentId);
+        
+        try {
+            Object monitoringData = xboxSyncService.getAgentMonitoring(agentId);
+            return Result.success(monitoringData);
+        } catch (Exception e) {
+            log.error("获取Agent监控信息失败", e);
+            return Result.error("获取监控信息失败: " + e.getMessage());
+        }
+    }
+
+    @Operation(summary = "测试Agent连接", description = "测试指定Agent的连接状态和代理功能")
+    @PostMapping("/test-agent/{agentId}")
+    public Result<String> testAgent(
+            @Parameter(description = "Agent ID", required = true)
+            @PathVariable String agentId,
+            @Parameter(description = "测试类型 (connection/proxy/all)", required = false)
+            @RequestParam(defaultValue = "all") String testType) {
+        
+        log.info("测试Agent: {} - {}", agentId, testType);
+        
+        try {
+            String testResult = xboxSyncService.testAgent(agentId, testType);
+            return Result.success(testResult);
+        } catch (Exception e) {
+            log.error("测试Agent失败", e);
+            return Result.error("测试失败: " + e.getMessage());
+        }
+    }
 }

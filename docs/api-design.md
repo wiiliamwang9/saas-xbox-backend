@@ -21,6 +21,202 @@
 - `404`: 资源不存在
 - `500`: 服务器内部错误
 
+## 2. Xbox系统集成API
+
+### 2.1 Xbox同步管理接口
+
+基础路径：`/api/xbox-sync`
+
+#### 检查Xbox Controller连接状态
+```http
+GET /xbox-sync/check-connection
+```
+
+**响应示例**：
+```json
+{
+  "code": 200,
+  "message": "连接成功",
+  "data": true,
+  "timestamp": 1703000000000
+}
+```
+
+#### 获取Xbox节点列表
+```http
+GET /xbox-sync/nodes
+```
+
+**响应示例**：
+```json
+{
+  "code": 200,
+  "message": "获取成功",
+  "data": [
+    {
+      "nodeCode": "test-node-agent",
+      "nodeName": "test-node",
+      "serverIp": "165.254.16.244",
+      "nodeStatus": "运行中",
+      "cpuUsage": 15.5,
+      "memoryUsage": 45.2,
+      "currentConnections": 128
+    }
+  ],
+  "timestamp": 1703000000000
+}
+```
+
+#### 同步所有节点信息
+```http
+POST /xbox-sync/sync-all
+```
+
+**响应示例**：
+```json
+{
+  "code": 200,
+  "message": "同步成功",
+  "data": "节点同步完成。总计: 2, 新增: 1, 更新: 1",
+  "timestamp": 1703000000000
+}
+```
+
+#### 同步指定节点信息
+```http
+POST /xbox-sync/sync/{agentId}
+```
+
+**路径参数**：
+- `agentId`: Agent ID
+
+**响应示例**：
+```json
+{
+  "code": 200,
+  "message": "同步成功",
+  "data": "节点更新成功",
+  "timestamp": 1703000000000
+}
+```
+
+### 2.2 Agent部署和管理接口
+
+#### 部署Agent到远程节点
+```http
+POST /xbox-sync/deploy-agent
+```
+
+**请求参数**：
+- `nodeIp` (required): 节点IP地址
+- `sshPort` (optional): SSH端口，默认22
+- `sshUser` (optional): SSH用户名，默认root
+- `sshPassword` (required): SSH密码
+
+**请求示例**：
+```http
+POST /xbox-sync/deploy-agent?nodeIp=165.254.16.244&sshPassword=Asd2025#
+```
+
+**响应示例**：
+```json
+{
+  "code": 200,
+  "message": "部署成功",
+  "data": "Agent部署成功: [部署日志信息]",
+  "timestamp": 1703000000000
+}
+```
+
+#### 更新Agent配置
+```http
+POST /xbox-sync/update-agent-config
+```
+
+**请求参数**：
+- `agentId` (required): Agent ID
+- `configType` (required): 配置类型 (blacklist/whitelist/protocols)
+
+**请求体**：
+```json
+{
+  "domains": ["example.com", "test.com"],
+  "action": "block",
+  "protocols": ["socks", "http", "shadowsocks"]
+}
+```
+
+**响应示例**：
+```json
+{
+  "code": 200,
+  "message": "配置更新成功",
+  "data": "配置更新成功: Agent配置已应用",
+  "timestamp": 1703000000000
+}
+```
+
+#### 获取Agent系统监控信息
+```http
+GET /xbox-sync/agent-monitoring/{agentId}
+```
+
+**路径参数**：
+- `agentId`: Agent ID
+
+**响应示例**：
+```json
+{
+  "code": 200,
+  "message": "获取成功",
+  "data": {
+    "cpu_usage": 15.5,
+    "memory_usage": 45.2,
+    "disk_usage": 67.8,
+    "network_connections": 128,
+    "singbox_status": "running",
+    "last_update": "2024-01-01T10:00:00Z"
+  },
+  "timestamp": 1703000000000
+}
+```
+
+#### 测试Agent连接和功能
+```http
+POST /xbox-sync/test-agent/{agentId}
+```
+
+**路径参数**：
+- `agentId`: Agent ID
+
+**请求参数**：
+- `testType` (optional): 测试类型 (connection/proxy/all)，默认all
+
+**响应示例**：
+```json
+{
+  "code": 200,
+  "message": "测试成功",
+  "data": "✓ 连接测试: 正常\n✓ 代理测试: 正常\n✓ 监控数据: 正常",
+  "timestamp": 1703000000000
+}
+```
+
+### 2.3 强制重新同步
+```http
+POST /xbox-sync/force-sync
+```
+
+**响应示例**：
+```json
+{
+  "code": 200,
+  "message": "同步成功",
+  "data": "强制同步完成。节点: 成功, 状态: 成功, 协议: 成功",
+  "timestamp": 1703000000000
+}
+```
+
 ## 2. 分页响应格式
 
 ```json

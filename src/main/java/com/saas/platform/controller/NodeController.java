@@ -26,7 +26,7 @@ import java.util.Map;
  */
 @Tag(name = "节点管理", description = "节点管理相关接口")
 @RestController
-@RequestMapping("/nodes")
+@RequestMapping("/api/nodes")
 @Validated
 public class NodeController {
 

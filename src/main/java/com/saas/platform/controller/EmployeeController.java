@@ -1,5 +1,6 @@
 package com.saas.platform.controller;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.saas.platform.dto.Result;
 import com.saas.platform.entity.Employee;
 import com.saas.platform.service.EmployeeService;
@@ -7,8 +8,12 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -21,11 +26,105 @@ import java.util.stream.Collectors;
  */
 @Tag(name = "员工管理", description = "员工管理相关接口")
 @RestController
-@RequestMapping("/admin/employee")
+@RequestMapping("/api/employees")
+@Validated
 public class EmployeeController {
 
     @Autowired
     private EmployeeService employeeService;
+
+    /**
+     * 分页查询员工列表
+     */
+    @Operation(summary = "分页查询员工列表", description = "支持按员工姓名、角色、状态筛选")
+    @GetMapping("/page")
+    public Result<IPage<Employee>> getEmployeePage(
+            @Parameter(description = "当前页", example = "1") @RequestParam(defaultValue = "1") Long current,
+            @Parameter(description = "每页大小", example = "10") @RequestParam(defaultValue = "10") Long size,
+            @Parameter(description = "员工姓名") @RequestParam(required = false) String realName,
+            @Parameter(description = "角色") @RequestParam(required = false) String role,
+            @Parameter(description = "员工状态") @RequestParam(required = false) String employeeStatus,
+            @Parameter(description = "部门ID") @RequestParam(required = false) Long departmentId) {
+        IPage<Employee> page = employeeService.getEmployeePage(current, size, realName, role, employeeStatus, departmentId);
+        return Result.success(page);
+    }
+
+    /**
+     * 创建员工
+     */
+    @Operation(summary = "创建员工", description = "添加新员工")
+    @PostMapping
+    public Result<String> createEmployee(@Valid @RequestBody Employee employee) {
+        boolean success = employeeService.createEmployee(employee);
+        return success ? Result.success("员工创建成功") : Result.error("员工创建失败");
+    }
+
+    /**
+     * 更新员工信息
+     */
+    @Operation(summary = "更新员工信息", description = "修改员工信息")
+    @PutMapping("/{id}")
+    public Result<String> updateEmployee(
+            @Parameter(description = "员工ID", example = "1") @PathVariable @NotNull Long id,
+            @Valid @RequestBody Employee employee) {
+        employee.setId(id);
+        boolean success = employeeService.updateEmployee(employee);
+        return success ? Result.success("员工更新成功") : Result.error("员工更新失败");
+    }
+
+    /**
+     * 删除员工
+     */
+    @Operation(summary = "删除员工", description = "根据ID删除员工")
+    @DeleteMapping("/{id}")
+    public Result<String> deleteEmployee(
+            @Parameter(description = "员工ID", example = "1") @PathVariable @NotNull Long id) {
+        boolean success = employeeService.deleteEmployee(id);
+        return success ? Result.success("员工删除成功") : Result.error("员工删除失败");
+    }
+
+    /**
+     * 批量删除员工
+     */
+    @Operation(summary = "批量删除员工", description = "根据ID列表批量删除员工")
+    @DeleteMapping("/batch")
+    public Result<String> batchDeleteEmployees(@RequestBody @NotEmpty List<Long> ids) {
+        boolean success = employeeService.batchDeleteEmployees(ids);
+        return success ? Result.success("员工批量删除成功") : Result.error("员工批量删除失败");
+    }
+
+    /**
+     * 批量更新员工状态
+     */
+    @Operation(summary = "批量更新员工状态", description = "批量修改员工状态")
+    @PutMapping("/batch/status")
+    public Result<String> batchUpdateStatus(
+            @RequestBody @NotEmpty List<Long> ids,
+            @Parameter(description = "新状态", example = "正常") @RequestParam String status) {
+        boolean success = employeeService.batchUpdateStatus(ids, status);
+        return success ? Result.success("员工状态批量更新成功") : Result.error("员工状态批量更新失败");
+    }
+
+    /**
+     * 重置员工密码
+     */
+    @Operation(summary = "重置员工密码", description = "重置员工密码为默认密码")
+    @PutMapping("/{id}/reset-password")
+    public Result<String> resetPassword(
+            @Parameter(description = "员工ID", example = "1") @PathVariable @NotNull Long id) {
+        boolean success = employeeService.resetPassword(id);
+        return success ? Result.success("密码重置成功") : Result.error("密码重置失败");
+    }
+
+    /**
+     * 获取员工统计信息
+     */
+    @Operation(summary = "获取员工统计信息", description = "获取员工的各种统计数据")
+    @GetMapping("/statistics")
+    public Result<Map<String, Object>> getEmployeeStatistics() {
+        Map<String, Object> statistics = employeeService.getEmployeeStatistics();
+        return Result.success(statistics);
+    }
 
     /**
      * 获取客户经理选项列表

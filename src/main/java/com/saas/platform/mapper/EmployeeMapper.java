@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 员工 Mapper 接口
@@ -55,4 +56,18 @@ public interface EmployeeMapper extends BaseMapper<Employee> {
      * @return 客户经理列表
      */
     List<Employee> selectManagerOptions();
+
+    /**
+     * 按角色统计员工数量
+     * 
+     * @return 角色统计列表
+     */
+    List<Map<String, Object>> getEmployeeCountByRole();
+
+    /**
+     * 按部门统计员工数量
+     * 
+     * @return 部门统计列表
+     */
+    List<Map<String, Object>> getEmployeeCountByDepartment();
 }

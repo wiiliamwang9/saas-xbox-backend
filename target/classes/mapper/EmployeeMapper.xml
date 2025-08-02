@@ -76,4 +76,26 @@
         ORDER BY real_name ASC
     </select>
 
+    <!-- 按角色统计员工数量 -->
+    <select id="getEmployeeCountByRole" resultType="java.util.Map">
+        SELECT 
+            role as name,
+            COUNT(*) as value
+        FROM employees
+        WHERE deleted_at IS NULL
+        GROUP BY role
+        ORDER BY COUNT(*) DESC
+    </select>
+
+    <!-- 按部门统计员工数量 -->
+    <select id="getEmployeeCountByDepartment" resultType="java.util.Map">
+        SELECT 
+            COALESCE(department_id, 0) as name,
+            COUNT(*) as value
+        FROM employees
+        WHERE deleted_at IS NULL
+        GROUP BY department_id
+        ORDER BY COUNT(*) DESC
+    </select>
+
 </mapper>

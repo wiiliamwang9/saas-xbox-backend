@@ -1,9 +1,11 @@
 package com.saas.platform.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.saas.platform.entity.Employee;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 员工服务接口
@@ -12,6 +14,75 @@ import java.util.List;
  * @since 2024-07-31
  */
 public interface EmployeeService extends IService<Employee> {
+
+    /**
+     * 分页查询员工列表
+     * 
+     * @param current 当前页
+     * @param size 每页大小
+     * @param realName 员工姓名
+     * @param role 角色
+     * @param employeeStatus 员工状态
+     * @param departmentId 部门ID
+     * @return 员工分页数据
+     */
+    IPage<Employee> getEmployeePage(Long current, Long size, String realName, String role, String employeeStatus, Long departmentId);
+
+    /**
+     * 创建员工
+     * 
+     * @param employee 员工信息
+     * @return 是否成功
+     */
+    boolean createEmployee(Employee employee);
+
+    /**
+     * 更新员工信息
+     * 
+     * @param employee 员工信息
+     * @return 是否成功
+     */
+    boolean updateEmployee(Employee employee);
+
+    /**
+     * 删除员工
+     * 
+     * @param id 员工ID
+     * @return 是否成功
+     */
+    boolean deleteEmployee(Long id);
+
+    /**
+     * 批量删除员工
+     * 
+     * @param ids 员工ID列表
+     * @return 是否成功
+     */
+    boolean batchDeleteEmployees(List<Long> ids);
+
+    /**
+     * 批量更新员工状态
+     * 
+     * @param ids 员工ID列表
+     * @param status 新状态
+     * @return 是否成功
+     */
+    boolean batchUpdateStatus(List<Long> ids, String status);
+
+    /**
+     * 重置员工密码
+     * 
+     * @param id 员工ID
+     * @return 是否成功
+     */
+    boolean resetPassword(Long id);
+
+    /**
+     * 获取员工统计信息
+     * 
+     * @return 统计数据
+     */
+    Map<String, Object> getEmployeeStatistics();
 
     /**
      * 根据用户名查询员工

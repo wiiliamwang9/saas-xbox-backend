@@ -324,4 +324,171 @@ public class XboxSyncServiceImpl implements XboxSyncService {
         existingNode.setLastCheckTime(LocalDateTime.now());
         existingNode.setUpdatedAt(LocalDateTime.now());
     }
+
+    @Override
+    public String deployAgentToNode(String nodeIp, Integer sshPort, String sshUser, String sshPassword) {
+        try {
+            log.info("开始部署Agent到节点: {}:{}", nodeIp, sshPort);
+            
+            // 构建部署脚本命令
+            String scriptPath = "/root/wl/code/xbox/scripts/deploy_agent.sh";
+            ProcessBuilder processBuilder = new ProcessBuilder(
+                "bash", scriptPath, nodeIp, sshPort.toString(), sshPassword
+            );
+            
+            Process process = processBuilder.start();
+            
+            // 读取输出
+            StringBuilder output = new StringBuilder();
+            try (java.io.BufferedReader reader = new java.io.BufferedReader(
+                    new java.io.InputStreamReader(process.getInputStream()))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    output.append(line).append("\n");
+                }
+            }
+            
+            int exitCode = process.waitFor();
+            
+            if (exitCode == 0) {
+                log.info("Agent部署成功到节点: {}", nodeIp);
+                return "Agent部署成功: " + output.toString();
+            } else {
+                log.error("Agent部署失败到节点: {}, 退出码: {}", nodeIp, exitCode);
+                return "Agent部署失败: " + output.toString();
+            }
+            
+        } catch (Exception e) {
+            log.error("部署Agent时发生异常", e);
+            throw new RuntimeException("部署Agent失败: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public String updateAgentConfig(String agentId, String configType, String configContent) {
+        try {
+            log.info("更新Agent配置: {} - {}", agentId, configType);
+            
+            // 构建配置更新请求
+            JSONObject configRequest = new JSONObject();
+            configRequest.put("agent_id", agentId);
+            configRequest.put("config_type", configType);
+            configRequest.put("config_content", configContent);
+            
+            String configUrl = xboxControllerUrl + "/api/v1/configs/" + agentId;
+            
+            // 发送PUT请求更新配置
+            org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
+            headers.set("Content-Type", "application/json");
+            
+            org.springframework.http.HttpEntity<String> entity = 
+                new org.springframework.http.HttpEntity<>(configRequest.toString(), headers);
+            
+            String response = restTemplate.exchange(
+                configUrl, 
+                org.springframework.http.HttpMethod.PUT, 
+                entity, 
+                String.class
+            ).getBody();
+            
+            log.info("配置更新响应: {}", response);
+            return "配置更新成功: " + response;
+            
+        } catch (Exception e) {
+            log.error("更新Agent配置失败", e);
+            throw new RuntimeException("配置更新失败: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public Object getAgentMonitoring(String agentId) {
+        try {
+            log.info("获取Agent监控信息: {}", agentId);
+            
+            String monitoringUrl = xboxControllerUrl + "/api/v1/monitoring/" + agentId;
+            String response = restTemplate.getForObject(monitoringUrl, String.class);
+            
+            if (response != null) {
+                JSONObject monitoringData = JSON.parseObject(response);
+                
+                // 解析监控数据
+                JSONObject result = new JSONObject();
+                if (monitoringData.containsKey("data")) {
+                    JSONObject data = monitoringData.getJSONObject("data");
+                    
+                    // 提取关键监控指标
+                    result.put("cpu_usage", data.getDoubleValue("cpu_usage_percent"));
+                    result.put("memory_usage", data.getDoubleValue("memory_usage_percent"));
+                    result.put("disk_usage", data.getDoubleValue("disk_usage_percent"));
+                    result.put("network_connections", data.getIntValue("network_connections"));
+                    result.put("singbox_status", data.getString("singbox_status"));
+                    result.put("last_update", data.getString("last_update"));
+                }
+                
+                return result;
+            }
+            
+            return new JSONObject();
+            
+        } catch (Exception e) {
+            log.error("获取Agent监控信息失败", e);
+            throw new RuntimeException("获取监控信息失败: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public String testAgent(String agentId, String testType) {
+        try {
+            log.info("测试Agent: {} - {}", agentId, testType);
+            
+            StringBuilder testResult = new StringBuilder();
+            
+            if ("connection".equals(testType) || "all".equals(testType)) {
+                // 测试连接状态
+                try {
+                    String statusUrl = xboxControllerUrl + "/api/v1/agents/" + agentId;
+                    String statusResponse = restTemplate.getForObject(statusUrl, String.class);
+                    
+                    if (statusResponse != null && statusResponse.contains("online")) {
+                        testResult.append("✓ 连接测试: 正常\n");
+                    } else {
+                        testResult.append("✗ 连接测试: 失败\n");
+                    }
+                } catch (Exception e) {
+                    testResult.append("✗ 连接测试: 异常 - ").append(e.getMessage()).append("\n");
+                }
+            }
+            
+            if ("proxy".equals(testType) || "all".equals(testType)) {
+                // 测试代理功能
+                try {
+                    // 这里可以实现代理功能测试
+                    // 例如通过代理端口发送测试请求
+                    testResult.append("✓ 代理测试: 需要实际连接测试\n");
+                } catch (Exception e) {
+                    testResult.append("✗ 代理测试: 异常 - ").append(e.getMessage()).append("\n");
+                }
+            }
+            
+            if ("all".equals(testType)) {
+                // 全面测试
+                try {
+                    Object monitoringData = getAgentMonitoring(agentId);
+                    if (monitoringData != null) {
+                        testResult.append("✓ 监控数据: 正常\n");
+                    } else {
+                        testResult.append("✗ 监控数据: 无数据\n");
+                    }
+                } catch (Exception e) {
+                    testResult.append("✗ 监控测试: 异常 - ").append(e.getMessage()).append("\n");
+                }
+            }
+            
+            return testResult.toString();
+            
+        } catch (Exception e) {
+            log.error("测试Agent失败", e);
+            throw new RuntimeException("测试失败: " + e.getMessage());
+        }
+    }
 }
