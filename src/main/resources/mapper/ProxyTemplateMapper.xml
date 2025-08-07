@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.saas.platform.mapper.ProxyTemplateMapper">
+
+    <!-- 分页查询代理产品模板列表 -->
+    <select id="selectTemplatePage" resultType="com.saas.platform.entity.ProxyTemplate">
+        SELECT * FROM proxy_templates
+        WHERE deleted_at IS NULL
+        <if test="productName != null and productName != ''">
+            AND product_name LIKE CONCAT('%', #{productName}, '%')
+        </if>
+        <if test="usageScenario != null and usageScenario != ''">
+            AND usage_scenario = #{usageScenario}
+        </if>
+        <if test="country != null and country != ''">
+            AND country = #{country}
+        </if>
+        <if test="status != null and status != ''">
+            AND status = #{status}
+        </if>
+        ORDER BY created_at DESC
+    </select>
+
+    <!-- 根据产品名称查询模板 -->
+    <select id="selectByProductName" resultType="com.saas.platform.entity.ProxyTemplate">
+        SELECT * FROM proxy_templates
+        WHERE product_name = #{productName}
+        AND deleted_at IS NULL
+        LIMIT 1
+    </select>
+
+    <!-- 根据国家查询模板列表 -->
+    <select id="selectByCountry" resultType="com.saas.platform.entity.ProxyTemplate">
+        SELECT * FROM proxy_templates
+        WHERE country = #{country}
+        AND deleted_at IS NULL
+        ORDER BY created_at DESC
+    </select>
+
+    <!-- 根据使用场景查询模板列表 -->
+    <select id="selectByUsageScenario" resultType="com.saas.platform.entity.ProxyTemplate">
+        SELECT * FROM proxy_templates
+        WHERE usage_scenario = #{usageScenario}
+        AND deleted_at IS NULL
+        ORDER BY created_at DESC
+    </select>
+
+    <!-- 根据协议类型查询模板列表 -->
+    <select id="selectByProtocolType" resultType="com.saas.platform.entity.ProxyTemplate">
+        SELECT * FROM proxy_templates
+        WHERE protocols LIKE CONCAT('%', #{protocolType}, '%')
+        AND deleted_at IS NULL
+        ORDER BY created_at DESC
+    </select>
+
+    <!-- 查询启用状态的模板 -->
+    <select id="selectEnabledTemplates" resultType="com.saas.platform.entity.ProxyTemplate">
+        SELECT * FROM proxy_templates
+        WHERE status = '上架'
+        AND deleted_at IS NULL
+        ORDER BY created_at DESC
+    </select>
+
+    <!-- 批量更新状态 -->
+    <update id="batchUpdateStatus">
+        UPDATE proxy_templates
+        SET status = #{status}, updated_at = NOW()
+        WHERE id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        AND deleted_at IS NULL
+    </update>
+
+    <!-- 统计各国家模板数量 -->
+    <select id="countByCountry" resultType="java.util.Map">
+        SELECT country, COUNT(*) as count
+        FROM proxy_templates
+        WHERE deleted_at IS NULL
+        GROUP BY country
+        ORDER BY count DESC
+    </select>
+
+    <!-- 统计各使用场景模板数量 -->
+    <select id="countByUsageScenario" resultType="java.util.Map">
+        SELECT usage_scenario as usageScenario, COUNT(*) as count
+        FROM proxy_templates
+        WHERE deleted_at IS NULL
+        GROUP BY usage_scenario
+        ORDER BY count DESC
+    </select>
+
+    <!-- 统计各代理模式模板数量 -->
+    <select id="countByProxyMode" resultType="java.util.Map">
+        SELECT proxy_mode as proxyMode, COUNT(*) as count
+        FROM proxy_templates
+        WHERE deleted_at IS NULL
+        GROUP BY proxy_mode
+        ORDER BY count DESC
+    </select>
+
+    <!-- 统计各协议类型模板数量 -->
+    <select id="countByProtocolType" resultType="java.util.Map">
+        SELECT 
+            'HTTP' as protocolType, 
+            COUNT(*) as count
+        FROM proxy_templates
+        WHERE protocols LIKE '%HTTP%'
+        AND deleted_at IS NULL
+        UNION ALL
+        SELECT 
+            'SOCKS5' as protocolType, 
+            COUNT(*) as count
+        FROM proxy_templates
+        WHERE protocols LIKE '%SOCKS5%'
+        AND deleted_at IS NULL
+        UNION ALL
+        SELECT 
+            'Shadowsocks' as protocolType, 
+            COUNT(*) as count
+        FROM proxy_templates
+        WHERE protocols LIKE '%Shadowsocks%'
+        AND deleted_at IS NULL
+        UNION ALL
+        SELECT 
+            'VMess' as protocolType, 
+            COUNT(*) as count
+        FROM proxy_templates
+        WHERE protocols LIKE '%VMess%'
+        AND deleted_at IS NULL
+        UNION ALL
+        SELECT 
+            'Trojan' as protocolType, 
+            COUNT(*) as count
+        FROM proxy_templates
+        WHERE protocols LIKE '%Trojan%'
+        AND deleted_at IS NULL
+        UNION ALL
+        SELECT 
+            'VLESS' as protocolType, 
+            COUNT(*) as count
+        FROM proxy_templates
+        WHERE protocols LIKE '%VLESS%'
+        AND deleted_at IS NULL
+        ORDER BY count DESC
+    </select>
+
+    <!-- 统计各状态模板数量 -->
+    <select id="countByStatus" resultType="java.util.Map">
+        SELECT status, COUNT(*) as count
+        FROM proxy_templates
+        WHERE deleted_at IS NULL
+        GROUP BY status
+        ORDER BY count DESC
+    </select>
+
+    <!-- 统计总库存 -->
+    <select id="sumStock" resultType="java.lang.Long">
+        SELECT COALESCE(SUM(stock), 0) as totalStock
+        FROM proxy_templates
+        WHERE deleted_at IS NULL
+        AND stock > 0
+    </select>
+
+    <!-- 计算平均价格 -->
+    <select id="avgPrice" resultType="java.math.BigDecimal">
+        SELECT COALESCE(AVG(default_price), 0) as avgPrice
+        FROM proxy_templates
+        WHERE deleted_at IS NULL
+        AND default_price > 0
+    </select>
+
+</mapper>

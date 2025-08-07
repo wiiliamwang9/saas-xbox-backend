@@ -36,16 +36,20 @@ public class EmployeeController {
     /**
      * 分页查询员工列表
      */
-    @Operation(summary = "分页查询员工列表", description = "支持按员工姓名、角色、状态筛选")
+    @Operation(summary = "分页查询员工列表", description = "支持按员工号、用户名、员工姓名、手机号、邮箱、角色、状态、部门筛选")
     @GetMapping("/page")
     public Result<IPage<Employee>> getEmployeePage(
             @Parameter(description = "当前页", example = "1") @RequestParam(defaultValue = "1") Long current,
             @Parameter(description = "每页大小", example = "10") @RequestParam(defaultValue = "10") Long size,
+            @Parameter(description = "员工号") @RequestParam(required = false) String employeeNo,
+            @Parameter(description = "用户名") @RequestParam(required = false) String username,
             @Parameter(description = "员工姓名") @RequestParam(required = false) String realName,
+            @Parameter(description = "手机号") @RequestParam(required = false) String phone,
+            @Parameter(description = "邮箱") @RequestParam(required = false) String email,
             @Parameter(description = "角色") @RequestParam(required = false) String role,
             @Parameter(description = "员工状态") @RequestParam(required = false) String employeeStatus,
             @Parameter(description = "部门ID") @RequestParam(required = false) Long departmentId) {
-        IPage<Employee> page = employeeService.getEmployeePage(current, size, realName, role, employeeStatus, departmentId);
+        IPage<Employee> page = employeeService.getEmployeePage(current, size, employeeNo, username, realName, phone, email, role, employeeStatus, departmentId);
         return Result.success(page);
     }
 

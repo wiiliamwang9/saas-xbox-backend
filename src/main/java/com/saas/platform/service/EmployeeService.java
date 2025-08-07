@@ -20,13 +20,17 @@ public interface EmployeeService extends IService<Employee> {
      * 
      * @param current 当前页
      * @param size 每页大小
+     * @param employeeNo 员工号
+     * @param username 用户名
      * @param realName 员工姓名
+     * @param phone 手机号
+     * @param email 邮箱
      * @param role 角色
      * @param employeeStatus 员工状态
      * @param departmentId 部门ID
      * @return 员工分页数据
      */
-    IPage<Employee> getEmployeePage(Long current, Long size, String realName, String role, String employeeStatus, Long departmentId);
+    IPage<Employee> getEmployeePage(Long current, Long size, String employeeNo, String username, String realName, String phone, String email, String role, String employeeStatus, Long departmentId);
 
     /**
      * 创建员工

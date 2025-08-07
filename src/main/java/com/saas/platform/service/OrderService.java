@@ -22,17 +22,23 @@ public interface OrderService extends IService<Order> {
      * @param current 当前页
      * @param size 每页大小
      * @param orderNo 订单号
+     * @param customerAccount 客户账号
      * @param customerName 客户名称
      * @param orderStatus 订单状态
      * @param paymentStatus 支付状态
+     * @param country 国家/地区
+     * @param city 城市
+     * @param ipQuality IP质量
+     * @param ipAddress IP地址
+     * @param productName 产品名称
      * @param managerId 客户经理ID
      * @param startTime 开始时间
      * @param endTime 结束时间
      * @return 分页结果
      */
-    IPage<Order> getOrderPage(Long current, Long size, String orderNo, String customerName,
-                             String orderStatus, String paymentStatus, Long managerId,
-                             LocalDateTime startTime, LocalDateTime endTime);
+    IPage<Order> getOrderPage(Long current, Long size, String orderNo, String customerAccount, String customerName,
+                             String orderStatus, String paymentStatus, String country, String city, String ipQuality, 
+                             String ipAddress, String productName, Long managerId, String startTime, String endTime);
 
     /**
      * 根据订单号查询订单

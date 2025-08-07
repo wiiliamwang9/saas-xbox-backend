@@ -153,7 +153,7 @@ This project includes comprehensive documentation for development:
 ### Xbox System Integration
 
 The backend integrates with the existing Xbox node controller system:
-- Xbox Controller API: http://localhost:8080/api/v1 (RESTful)
+- Xbox Controller API: http://localhost:9000/api/v1 (RESTful)
 - Xbox Agent API: http://localhost:8081 (Health checks)
 - gRPC Integration: Node registration and heartbeat
 - Real-time monitoring: System metrics and alerts

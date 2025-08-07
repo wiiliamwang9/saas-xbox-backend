@@ -5,6 +5,7 @@
 /root/wl/code/saas-xbox-backend/src/main/java/com/saas/platform/config/ScheduleConfig.java
 /root/wl/code/saas-xbox-backend/src/main/java/com/saas/platform/config/SecurityConfig.java
 /root/wl/code/saas-xbox-backend/src/main/java/com/saas/platform/config/SwaggerConfig.java
+/root/wl/code/saas-xbox-backend/src/main/java/com/saas/platform/controller/AfterSalesController.java
 /root/wl/code/saas-xbox-backend/src/main/java/com/saas/platform/controller/CustomerController.java
 /root/wl/code/saas-xbox-backend/src/main/java/com/saas/platform/controller/EmployeeController.java
 /root/wl/code/saas-xbox-backend/src/main/java/com/saas/platform/controller/HealthController.java
@@ -12,6 +13,7 @@
 /root/wl/code/saas-xbox-backend/src/main/java/com/saas/platform/controller/NodeController.java
 /root/wl/code/saas-xbox-backend/src/main/java/com/saas/platform/controller/OrderController.java
 /root/wl/code/saas-xbox-backend/src/main/java/com/saas/platform/controller/ProductController.java
+/root/wl/code/saas-xbox-backend/src/main/java/com/saas/platform/controller/ProxyTemplateController.java
 /root/wl/code/saas-xbox-backend/src/main/java/com/saas/platform/controller/XboxSyncController.java
 /root/wl/code/saas-xbox-backend/src/main/java/com/saas/platform/dto/CustomerDTO.java
 /root/wl/code/saas-xbox-backend/src/main/java/com/saas/platform/dto/CustomerQuery.java
@@ -32,6 +34,7 @@
 /root/wl/code/saas-xbox-backend/src/main/java/com/saas/platform/entity/NodeGroupMember.java
 /root/wl/code/saas-xbox-backend/src/main/java/com/saas/platform/entity/Order.java
 /root/wl/code/saas-xbox-backend/src/main/java/com/saas/platform/entity/Product.java
+/root/wl/code/saas-xbox-backend/src/main/java/com/saas/platform/entity/ProxyTemplate.java
 /root/wl/code/saas-xbox-backend/src/main/java/com/saas/platform/exception/BusinessException.java
 /root/wl/code/saas-xbox-backend/src/main/java/com/saas/platform/exception/GlobalExceptionHandler.java
 /root/wl/code/saas-xbox-backend/src/main/java/com/saas/platform/mapper/CustomerMapper.java
@@ -41,6 +44,7 @@
 /root/wl/code/saas-xbox-backend/src/main/java/com/saas/platform/mapper/NodeMapper.java
 /root/wl/code/saas-xbox-backend/src/main/java/com/saas/platform/mapper/OrderMapper.java
 /root/wl/code/saas-xbox-backend/src/main/java/com/saas/platform/mapper/ProductMapper.java
+/root/wl/code/saas-xbox-backend/src/main/java/com/saas/platform/mapper/ProxyTemplateMapper.java
 /root/wl/code/saas-xbox-backend/src/main/java/com/saas/platform/schedule/XboxSyncScheduler.java
 /root/wl/code/saas-xbox-backend/src/main/java/com/saas/platform/service/CustomerService.java
 /root/wl/code/saas-xbox-backend/src/main/java/com/saas/platform/service/EmployeeService.java
@@ -50,6 +54,7 @@
 /root/wl/code/saas-xbox-backend/src/main/java/com/saas/platform/service/NodeService.java
 /root/wl/code/saas-xbox-backend/src/main/java/com/saas/platform/service/OrderService.java
 /root/wl/code/saas-xbox-backend/src/main/java/com/saas/platform/service/ProductService.java
+/root/wl/code/saas-xbox-backend/src/main/java/com/saas/platform/service/ProxyTemplateService.java
 /root/wl/code/saas-xbox-backend/src/main/java/com/saas/platform/service/XboxSyncService.java
 /root/wl/code/saas-xbox-backend/src/main/java/com/saas/platform/service/impl/CustomerServiceImpl.java
 /root/wl/code/saas-xbox-backend/src/main/java/com/saas/platform/service/impl/EmployeeServiceImpl.java
@@ -58,5 +63,6 @@
 /root/wl/code/saas-xbox-backend/src/main/java/com/saas/platform/service/impl/NodeServiceImpl.java
 /root/wl/code/saas-xbox-backend/src/main/java/com/saas/platform/service/impl/OrderServiceImpl.java
 /root/wl/code/saas-xbox-backend/src/main/java/com/saas/platform/service/impl/ProductServiceImpl.java
+/root/wl/code/saas-xbox-backend/src/main/java/com/saas/platform/service/impl/ProxyTemplateServiceImpl.java
 /root/wl/code/saas-xbox-backend/src/main/java/com/saas/platform/service/impl/XboxSyncServiceImpl.java
 /root/wl/code/saas-xbox-backend/src/main/java/com/saas/platform/util/IpLocationUtil.java

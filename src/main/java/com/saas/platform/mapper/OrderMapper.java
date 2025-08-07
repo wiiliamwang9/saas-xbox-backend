@@ -6,6 +6,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.saas.platform.entity.Order;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -48,6 +50,7 @@ public interface OrderMapper extends BaseMapper<Order> {
      * @param orderNo 订单号
      * @return 订单信息
      */
+    @Select("SELECT * FROM orders WHERE order_no = #{orderNo} AND deleted_at IS NULL LIMIT 1")
     Order selectByOrderNo(@Param("orderNo") String orderNo);
 
     /**
@@ -56,6 +59,7 @@ public interface OrderMapper extends BaseMapper<Order> {
      * @param customerId 客户ID
      * @return 订单列表
      */
+    @Select("SELECT * FROM orders WHERE customer_id = #{customerId} AND deleted_at IS NULL ORDER BY created_at DESC")
     List<Order> selectByCustomerId(@Param("customerId") Long customerId);
 
     /**
@@ -64,6 +68,7 @@ public interface OrderMapper extends BaseMapper<Order> {
      * @param managerId 客户经理ID
      * @return 订单列表
      */
+    @Select("SELECT * FROM orders WHERE manager_id = #{managerId} AND deleted_at IS NULL ORDER BY created_at DESC")
     List<Order> selectByManagerId(@Param("managerId") Long managerId);
 
     /**
@@ -72,6 +77,7 @@ public interface OrderMapper extends BaseMapper<Order> {
      * @param days 天数
      * @return 订单列表
      */
+    @Select("SELECT * FROM orders WHERE expire_time BETWEEN NOW() AND DATE_ADD(NOW(), INTERVAL #{days} DAY) AND order_status = '运行中' AND deleted_at IS NULL ORDER BY expire_time")
     List<Order> selectExpiringOrders(@Param("days") Integer days);
 
     /**
@@ -79,6 +85,7 @@ public interface OrderMapper extends BaseMapper<Order> {
      * 
      * @return 订单列表
      */
+    @Select("SELECT * FROM orders WHERE expire_time < NOW() AND order_status = '运行中' AND deleted_at IS NULL ORDER BY expire_time")
     List<Order> selectExpiredOrders();
 
     /**
@@ -88,6 +95,7 @@ public interface OrderMapper extends BaseMapper<Order> {
      * @param status 新状态
      * @return 影响行数
      */
+    @Update("<script>UPDATE orders SET order_status = #{status}, updated_at = NOW() WHERE id IN <foreach collection='ids' item='id' open='(' separator=',' close=')'>#{id}</foreach> AND deleted_at IS NULL</script>")
     int batchUpdateStatus(@Param("ids") List<Long> ids, @Param("status") String status);
 
     /**
@@ -95,6 +103,7 @@ public interface OrderMapper extends BaseMapper<Order> {
      * 
      * @return 统计结果
      */
+    @Select("SELECT order_status as label, COUNT(*) as value FROM orders WHERE deleted_at IS NULL GROUP BY order_status")
     List<java.util.Map<String, Object>> countByStatus();
 
     /**
@@ -102,6 +111,7 @@ public interface OrderMapper extends BaseMapper<Order> {
      * 
      * @return 统计结果
      */
+    @Select("SELECT payment_status as label, COUNT(*) as value FROM orders WHERE deleted_at IS NULL GROUP BY payment_status")
     List<java.util.Map<String, Object>> countByPaymentStatus();
 
     /**
@@ -111,6 +121,7 @@ public interface OrderMapper extends BaseMapper<Order> {
      * @param endTime 结束时间
      * @return 金额汇总
      */
+    @Select("SELECT SUM(total_amount) as totalAmount, SUM(actual_amount) as actualAmount, COUNT(*) as orderCount FROM orders WHERE created_at BETWEEN #{startTime} AND #{endTime} AND deleted_at IS NULL")
     java.util.Map<String, Object> sumOrderAmount(@Param("startTime") LocalDateTime startTime,
                                                   @Param("endTime") LocalDateTime endTime);
 
@@ -121,6 +132,7 @@ public interface OrderMapper extends BaseMapper<Order> {
      * @param endTime 结束时间
      * @return 统计结果
      */
+    @Select("SELECT DATE(created_at) as date, COUNT(*) as orderCount, SUM(total_amount) as totalAmount FROM orders WHERE created_at BETWEEN #{startTime} AND #{endTime} AND deleted_at IS NULL GROUP BY DATE(created_at) ORDER BY date")
     List<java.util.Map<String, Object>> countByDate(@Param("startTime") LocalDateTime startTime,
                                                      @Param("endTime") LocalDateTime endTime);
 
@@ -131,6 +143,7 @@ public interface OrderMapper extends BaseMapper<Order> {
      * @param endTime 结束时间
      * @return 统计结果
      */
+    @Select("SELECT product_name as label, COUNT(*) as value FROM orders WHERE created_at BETWEEN #{startTime} AND #{endTime} AND deleted_at IS NULL GROUP BY product_name")
     List<java.util.Map<String, Object>> countByProduct(@Param("startTime") LocalDateTime startTime,
                                                         @Param("endTime") LocalDateTime endTime);
 
@@ -141,6 +154,7 @@ public interface OrderMapper extends BaseMapper<Order> {
      * @param endTime 结束时间
      * @return 统计结果
      */
+    @Select("SELECT country as label, COUNT(*) as value FROM orders WHERE created_at BETWEEN #{startTime} AND #{endTime} AND deleted_at IS NULL GROUP BY country")
     List<java.util.Map<String, Object>> countByCountry(@Param("startTime") LocalDateTime startTime,
                                                         @Param("endTime") LocalDateTime endTime);
 
@@ -150,5 +164,6 @@ public interface OrderMapper extends BaseMapper<Order> {
      * @param customerId 客户ID
      * @return 订单列表
      */
+    @Select("SELECT * FROM orders WHERE customer_id = #{customerId} AND order_status IN ('正常', '运行中') AND deleted_at IS NULL ORDER BY created_at DESC")
     List<Order> selectActiveOrdersByCustomerId(@Param("customerId") Long customerId);
 }

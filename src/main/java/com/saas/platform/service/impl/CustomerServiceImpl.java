@@ -28,10 +28,60 @@ import java.util.Map;
 public class CustomerServiceImpl extends ServiceImpl<CustomerMapper, Customer> implements CustomerService {
 
     @Override
-    public IPage<Customer> getCustomerPage(Long current, Long size, String customerName, String customerType, 
-                                         String vipLevel, String customerStatus, Long managerId) {
+    public IPage<Customer> getCustomerPage(Long current, Long size, String account, String customerName, String customerType, 
+                                         String vipLevel, String customerStatus, String phone, String email, String registerSource, Long managerId) {
         Page<Customer> page = new Page<>(current, size);
-        return baseMapper.selectCustomerPage(page, customerName, customerType, vipLevel, customerStatus, managerId);
+        LambdaQueryWrapper<Customer> wrapper = new LambdaQueryWrapper<>();
+        
+        // 客户账号查询
+        if (StringUtils.hasText(account)) {
+            wrapper.like(Customer::getAccount, account);
+        }
+        
+        // 客户名称查询
+        if (StringUtils.hasText(customerName)) {
+            wrapper.like(Customer::getCustomerName, customerName);
+        }
+        
+        // 客户类型查询
+        if (StringUtils.hasText(customerType)) {
+            wrapper.eq(Customer::getCustomerType, customerType);
+        }
+        
+        // VIP等级查询
+        if (StringUtils.hasText(vipLevel)) {
+            wrapper.eq(Customer::getVipLevel, vipLevel);
+        }
+        
+        // 客户状态查询
+        if (StringUtils.hasText(customerStatus)) {
+            wrapper.eq(Customer::getCustomerStatus, customerStatus);
+        }
+        
+        // 手机号查询
+        if (StringUtils.hasText(phone)) {
+            wrapper.like(Customer::getPhone, phone);
+        }
+        
+        // 邮箱查询
+        if (StringUtils.hasText(email)) {
+            wrapper.like(Customer::getEmail, email);
+        }
+        
+        // 注册来源查询
+        if (StringUtils.hasText(registerSource)) {
+            wrapper.eq(Customer::getRegisterSource, registerSource);
+        }
+        
+        // 客户经理查询
+        if (managerId != null) {
+            wrapper.eq(Customer::getManagerId, managerId);
+        }
+        
+        // 按创建时间倒序排列
+        wrapper.orderByDesc(Customer::getCreatedAt);
+        
+        return this.page(page, wrapper);
     }
 
     @Override

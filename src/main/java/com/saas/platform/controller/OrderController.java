@@ -27,7 +27,7 @@ import java.util.Map;
  */
 @Tag(name = "订单管理", description = "订单管理相关接口")
 @RestController
-@RequestMapping("/api/orders")
+@RequestMapping("/orders")
 @Validated
 public class OrderController {
 
@@ -37,20 +37,26 @@ public class OrderController {
     /**
      * 分页查询订单列表
      */
-    @Operation(summary = "分页查询订单列表", description = "支持按订单号、客户名称、状态等筛选")
+    @Operation(summary = "分页查询订单列表", description = "支持按订单号、客户账号、客户名称、状态、国家、IP质量、IP地址等筛选")
     @GetMapping("/page")
     public Result<IPage<Order>> getOrderPage(
             @Parameter(description = "当前页", example = "1") @RequestParam(defaultValue = "1") Long current,
             @Parameter(description = "每页大小", example = "10") @RequestParam(defaultValue = "10") Long size,
             @Parameter(description = "订单号") @RequestParam(required = false) String orderNo,
+            @Parameter(description = "客户账号") @RequestParam(required = false) String customerAccount,
             @Parameter(description = "客户名称") @RequestParam(required = false) String customerName,
             @Parameter(description = "订单状态") @RequestParam(required = false) String orderStatus,
             @Parameter(description = "支付状态") @RequestParam(required = false) String paymentStatus,
+            @Parameter(description = "国家/地区") @RequestParam(required = false) String country,
+            @Parameter(description = "城市") @RequestParam(required = false) String city,
+            @Parameter(description = "IP质量") @RequestParam(required = false) String ipQuality,
+            @Parameter(description = "IP地址") @RequestParam(required = false) String ipAddress,
+            @Parameter(description = "产品名称") @RequestParam(required = false) String productName,
             @Parameter(description = "客户经理ID") @RequestParam(required = false) Long managerId,
-            @Parameter(description = "开始时间") @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime startTime,
-            @Parameter(description = "结束时间") @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime endTime) {
-        IPage<Order> page = orderService.getOrderPage(current, size, orderNo, customerName, 
-                orderStatus, paymentStatus, managerId, startTime, endTime);
+            @Parameter(description = "开始时间", example = "2024-01-01") @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") String startTime,
+            @Parameter(description = "结束时间", example = "2024-12-31") @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") String endTime) {
+        IPage<Order> page = orderService.getOrderPage(current, size, orderNo, customerAccount, customerName, 
+                orderStatus, paymentStatus, country, city, ipQuality, ipAddress, productName, managerId, startTime, endTime);
         return Result.success(page);
     }
 

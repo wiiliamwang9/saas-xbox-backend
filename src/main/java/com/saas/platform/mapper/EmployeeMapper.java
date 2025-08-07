@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.saas.platform.entity.Employee;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 import java.util.Map;
@@ -23,6 +24,7 @@ public interface EmployeeMapper extends BaseMapper<Employee> {
      * @param username 用户名
      * @return 员工信息
      */
+    @Select("SELECT * FROM employees WHERE username = #{username} AND deleted_at IS NULL LIMIT 1")
     Employee selectByUsername(@Param("username") String username);
 
     /**
@@ -31,6 +33,7 @@ public interface EmployeeMapper extends BaseMapper<Employee> {
      * @param employeeNo 员工号
      * @return 员工信息
      */
+    @Select("SELECT * FROM employees WHERE employee_no = #{employeeNo} AND deleted_at IS NULL LIMIT 1")
     Employee selectByEmployeeNo(@Param("employeeNo") String employeeNo);
 
     /**
@@ -39,6 +42,7 @@ public interface EmployeeMapper extends BaseMapper<Employee> {
      * @param role 角色
      * @return 员工列表
      */
+    @Select("SELECT * FROM employees WHERE role = #{role} AND deleted_at IS NULL ORDER BY created_at DESC")
     List<Employee> selectByRole(@Param("role") String role);
 
     /**
@@ -47,6 +51,7 @@ public interface EmployeeMapper extends BaseMapper<Employee> {
      * @param departmentId 部门ID
      * @return 员工列表
      */
+    @Select("SELECT * FROM employees WHERE department_id = #{departmentId} AND deleted_at IS NULL ORDER BY created_at DESC")
     List<Employee> selectByDepartmentId(@Param("departmentId") Long departmentId);
 
     /**
@@ -55,6 +60,7 @@ public interface EmployeeMapper extends BaseMapper<Employee> {
      * 
      * @return 客户经理列表
      */
+    @Select("SELECT * FROM employees WHERE role = '客户经理' AND employee_status = '正常' AND deleted_at IS NULL ORDER BY real_name")
     List<Employee> selectManagerOptions();
 
     /**
@@ -62,6 +68,7 @@ public interface EmployeeMapper extends BaseMapper<Employee> {
      * 
      * @return 角色统计列表
      */
+    @Select("SELECT role as label, COUNT(*) as value FROM employees WHERE deleted_at IS NULL GROUP BY role")
     List<Map<String, Object>> getEmployeeCountByRole();
 
     /**
@@ -69,5 +76,6 @@ public interface EmployeeMapper extends BaseMapper<Employee> {
      * 
      * @return 部门统计列表
      */
+    @Select("SELECT COALESCE(department_id, '未分配') as label, COUNT(*) as value FROM employees WHERE deleted_at IS NULL GROUP BY department_id")
     List<Map<String, Object>> getEmployeeCountByDepartment();
 }

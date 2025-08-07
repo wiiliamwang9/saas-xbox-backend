@@ -21,15 +21,19 @@ public interface CustomerService extends IService<Customer> {
      * 
      * @param current 当前页
      * @param size 每页大小
+     * @param account 客户账号
      * @param customerName 客户名称
      * @param customerType 客户类型
      * @param vipLevel VIP等级
      * @param customerStatus 客户状态
+     * @param phone 手机号
+     * @param email 邮箱
+     * @param registerSource 注册来源
      * @param managerId 客户经理ID
      * @return 分页结果
      */
-    IPage<Customer> getCustomerPage(Long current, Long size, String customerName, String customerType, 
-                                   String vipLevel, String customerStatus, Long managerId);
+    IPage<Customer> getCustomerPage(Long current, Long size, String account, String customerName, String customerType, 
+                                   String vipLevel, String customerStatus, String phone, String email, String registerSource, Long managerId);
 
     /**
      * 根据账号查询客户

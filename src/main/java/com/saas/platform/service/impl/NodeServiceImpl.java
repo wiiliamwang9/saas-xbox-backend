@@ -8,6 +8,7 @@ import com.saas.platform.entity.Node;
 import com.saas.platform.exception.BusinessException;
 import com.saas.platform.mapper.NodeMapper;
 import com.saas.platform.service.NodeService;
+import com.saas.platform.service.XboxSyncService;
 import com.saas.platform.util.IpLocationUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,9 +31,11 @@ import java.util.stream.Collectors;
 public class NodeServiceImpl extends ServiceImpl<NodeMapper, Node> implements NodeService {
     
     private final IpLocationUtil ipLocationUtil;
+    private final XboxSyncService xboxSyncService;
     
-    public NodeServiceImpl(IpLocationUtil ipLocationUtil) {
+    public NodeServiceImpl(IpLocationUtil ipLocationUtil, XboxSyncService xboxSyncService) {
         this.ipLocationUtil = ipLocationUtil;
+        this.xboxSyncService = xboxSyncService;
     }
 
     @Override
@@ -617,25 +620,43 @@ public class NodeServiceImpl extends ServiceImpl<NodeMapper, Node> implements No
             throw new BusinessException("Agent已部署，无需重复部署");
         }
         
+        // 验证必要参数
+        if (!StringUtils.hasText(node.getServerIp())) {
+            throw new BusinessException("节点服务器IP不能为空");
+        }
+        if (node.getSshPort() == null) {
+            throw new BusinessException("SSH端口不能为空");
+        }
+        if (!StringUtils.hasText(node.getPassword())) {
+            throw new BusinessException("SSH密码不能为空");
+        }
+        
         try {
             // 设置部署中状态
             node.setAgentStatus("部署中");
             updateById(node);
             
-            // TODO: 实际的Agent部署逻辑
-            // 1. SSH连接到节点
-            // 2. 下载Agent程序
-            // 3. 安装并启动Agent
-            // 4. 验证Agent状态
+            // 调用Xbox Controller部署Agent
+            String deployResult = xboxSyncService.deployAgentToNode(
+                node.getServerIp(), 
+                node.getSshPort(), 
+                "root", // 默认使用root用户，也可以从Node实体中获取
+                node.getPassword()
+            );
             
-            // 模拟部署过程
-            Thread.sleep(2000);
+            // 检查部署结果
+            if (deployResult != null && deployResult.contains("成功")) {
+                // 更新为已部署状态
+                node.setAgentStatus("已部署");
+                updateById(node);
+                return true;
+            } else {
+                // 部署失败
+                node.setAgentStatus("未部署");
+                updateById(node);
+                throw new BusinessException("Agent部署失败: " + deployResult);
+            }
             
-            // 更新为已部署状态
-            node.setAgentStatus("已部署");
-            updateById(node);
-            
-            return true;
         } catch (Exception e) {
             // 部署失败，恢复为未部署状态
             node.setAgentStatus("未部署");

@@ -32,19 +32,46 @@ import java.util.Map;
 public class EmployeeServiceImpl extends ServiceImpl<EmployeeMapper, Employee> implements EmployeeService {
 
     @Override
-    public IPage<Employee> getEmployeePage(Long current, Long size, String realName, String role, String employeeStatus, Long departmentId) {
+    public IPage<Employee> getEmployeePage(Long current, Long size, String employeeNo, String username, String realName, String phone, String email, String role, String employeeStatus, Long departmentId) {
         Page<Employee> page = new Page<>(current, size);
         LambdaQueryWrapper<Employee> wrapper = new LambdaQueryWrapper<>();
         
+        // 员工号查询
+        if (StrUtil.isNotBlank(employeeNo)) {
+            wrapper.like(Employee::getEmployeeNo, employeeNo);
+        }
+        
+        // 用户名查询
+        if (StrUtil.isNotBlank(username)) {
+            wrapper.like(Employee::getUsername, username);
+        }
+        
+        // 真实姓名查询
         if (StrUtil.isNotBlank(realName)) {
             wrapper.like(Employee::getRealName, realName);
         }
+        
+        // 手机号查询
+        if (StrUtil.isNotBlank(phone)) {
+            wrapper.like(Employee::getPhone, phone);
+        }
+        
+        // 邮箱查询
+        if (StrUtil.isNotBlank(email)) {
+            wrapper.like(Employee::getEmail, email);
+        }
+        
+        // 角色查询
         if (StrUtil.isNotBlank(role)) {
             wrapper.eq(Employee::getRole, role);
         }
+        
+        // 员工状态查询
         if (StrUtil.isNotBlank(employeeStatus)) {
             wrapper.eq(Employee::getEmployeeStatus, employeeStatus);
         }
+        
+        // 部门查询
         if (departmentId != null) {
             wrapper.eq(Employee::getDepartmentId, departmentId);
         }

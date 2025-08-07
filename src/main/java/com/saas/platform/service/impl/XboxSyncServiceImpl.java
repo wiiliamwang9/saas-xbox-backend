@@ -13,6 +13,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
@@ -38,7 +40,7 @@ public class XboxSyncServiceImpl implements XboxSyncService {
     @Autowired
     private RestTemplate restTemplate;
 
-    @Value("${xbox.controller.url:http://localhost:8080}")
+    @Value("${xbox.controller.url:http://localhost:9000}")
     private String xboxControllerUrl;
 
     @Override
@@ -324,43 +326,57 @@ public class XboxSyncServiceImpl implements XboxSyncService {
         existingNode.setLastCheckTime(LocalDateTime.now());
         existingNode.setUpdatedAt(LocalDateTime.now());
     }
+    
+    /**
+     * 获取JSON请求头
+     */
+    private org.springframework.http.HttpHeaders getJsonHeaders() {
+        org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
+        headers.set("Content-Type", "application/json");
+        headers.set("Accept", "application/json");
+        return headers;
+    }
 
     @Override
     public String deployAgentToNode(String nodeIp, Integer sshPort, String sshUser, String sshPassword) {
         try {
-            log.info("开始部署Agent到节点: {}:{}", nodeIp, sshPort);
+            log.info("开始部署Agent到节点: {}:{} 用户: {}", nodeIp, sshPort, sshUser);
             
-            // 构建部署脚本命令
-            String scriptPath = "/root/wl/code/xbox/scripts/deploy_agent.sh";
-            ProcessBuilder processBuilder = new ProcessBuilder(
-                "bash", scriptPath, nodeIp, sshPort.toString(), sshPassword
-            );
+            // 构建部署请求的JSON数据
+            JSONObject deployRequest = new JSONObject();
+            deployRequest.put("node_ip", nodeIp);
+            deployRequest.put("ssh_port", sshPort);
+            deployRequest.put("ssh_user", sshUser);
+            deployRequest.put("ssh_password", sshPassword);
             
-            Process process = processBuilder.start();
+            // 调用Xbox Controller的部署Agent API
+            String deployUrl = xboxControllerUrl + "/api/v1/agents/deploy";
+            HttpEntity<String> entity = new HttpEntity<>(deployRequest.toJSONString(), getJsonHeaders());
             
-            // 读取输出
-            StringBuilder output = new StringBuilder();
-            try (java.io.BufferedReader reader = new java.io.BufferedReader(
-                    new java.io.InputStreamReader(process.getInputStream()))) {
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    output.append(line).append("\n");
-                }
-            }
+            log.info("调用Xbox Controller部署API: {}", deployUrl);
+            log.info("请求参数: {}", deployRequest.toJSONString());
             
-            int exitCode = process.waitFor();
+            ResponseEntity<String> response = restTemplate.postForEntity(deployUrl, entity, String.class);
+            String responseBody = response.getBody();
             
-            if (exitCode == 0) {
-                log.info("Agent部署成功到节点: {}", nodeIp);
-                return "Agent部署成功: " + output.toString();
+            log.info("Xbox Controller响应: {}", responseBody);
+            
+            // 解析响应
+            JSONObject jsonResponse = JSON.parseObject(responseBody);
+            if (jsonResponse.getInteger("code") == 200) {
+                String message = "Agent部署成功到节点: " + nodeIp;
+                log.info(message);
+                return message;
             } else {
-                log.error("Agent部署失败到节点: {}, 退出码: {}", nodeIp, exitCode);
-                return "Agent部署失败: " + output.toString();
+                String errorMessage = "Agent部署失败: " + jsonResponse.getString("message");
+                log.error(errorMessage);
+                return errorMessage;
             }
             
         } catch (Exception e) {
-            log.error("部署Agent时发生异常", e);
-            throw new RuntimeException("部署Agent失败: " + e.getMessage());
+            String errorMessage = "调用Xbox Controller部署Agent失败: " + e.getMessage();
+            log.error(errorMessage, e);
+            return errorMessage;
         }
     }
 

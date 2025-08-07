@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -32,12 +33,90 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     private static final AtomicLong ORDER_COUNTER = new AtomicLong(1);
 
     @Override
-    public IPage<Order> getOrderPage(Long current, Long size, String orderNo, String customerName,
-                                   String orderStatus, String paymentStatus, Long managerId,
-                                   LocalDateTime startTime, LocalDateTime endTime) {
+    public IPage<Order> getOrderPage(Long current, Long size, String orderNo, String customerAccount, String customerName,
+                                   String orderStatus, String paymentStatus, String country, String city, String ipQuality, 
+                                   String ipAddress, String productName, Long managerId, String startTime, String endTime) {
         Page<Order> page = new Page<>(current, size);
-        return baseMapper.selectOrderPage(page, orderNo, customerName, orderStatus, paymentStatus, 
-                                        managerId, startTime, endTime);
+        LambdaQueryWrapper<Order> wrapper = new LambdaQueryWrapper<>();
+        
+        // 订单号查询
+        if (StringUtils.hasText(orderNo)) {
+            wrapper.like(Order::getOrderNo, orderNo);
+        }
+        
+        // 客户账号查询
+        if (StringUtils.hasText(customerAccount)) {
+            wrapper.like(Order::getCustomerAccount, customerAccount);
+        }
+        
+        // 客户名称查询
+        if (StringUtils.hasText(customerName)) {
+            wrapper.like(Order::getCustomerName, customerName);
+        }
+        
+        // 订单状态查询
+        if (StringUtils.hasText(orderStatus)) {
+            wrapper.eq(Order::getOrderStatus, orderStatus);
+        }
+        
+        // 支付状态查询
+        if (StringUtils.hasText(paymentStatus)) {
+            wrapper.eq(Order::getPaymentStatus, paymentStatus);
+        }
+        
+        // 国家/地区查询
+        if (StringUtils.hasText(country)) {
+            wrapper.eq(Order::getCountry, country);
+        }
+        
+        // 城市查询
+        if (StringUtils.hasText(city)) {
+            wrapper.eq(Order::getCity, city);
+        }
+        
+        // IP质量查询
+        if (StringUtils.hasText(ipQuality)) {
+            wrapper.eq(Order::getIpQuality, ipQuality);
+        }
+        
+        // IP地址查询 - 这里使用JSON数组查询，需要用JSON_CONTAINS函数
+        if (StringUtils.hasText(ipAddress)) {
+            wrapper.apply("JSON_CONTAINS(ip_addresses, '\"" + ipAddress + "\"')");
+        }
+        
+        // 产品名称查询
+        if (StringUtils.hasText(productName)) {
+            wrapper.like(Order::getProductName, productName);
+        }
+        
+        // 客户经理查询
+        if (managerId != null) {
+            wrapper.eq(Order::getManagerId, managerId);
+        }
+        
+        // 时间范围查询
+        if (StringUtils.hasText(startTime)) {
+            try {
+                LocalDate startDate = LocalDate.parse(startTime);
+                wrapper.ge(Order::getCreatedAt, startDate.atStartOfDay());
+            } catch (Exception e) {
+                // 日期格式错误，忽略此条件
+            }
+        }
+        
+        if (StringUtils.hasText(endTime)) {
+            try {
+                LocalDate endDate = LocalDate.parse(endTime);
+                wrapper.le(Order::getCreatedAt, endDate.atTime(23, 59, 59));
+            } catch (Exception e) {
+                // 日期格式错误，忽略此条件
+            }
+        }
+        
+        // 按创建时间倒序排列
+        wrapper.orderByDesc(Order::getCreatedAt);
+        
+        return this.page(page, wrapper);
     }
 
     @Override

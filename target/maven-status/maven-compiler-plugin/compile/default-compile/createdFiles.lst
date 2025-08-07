@@ -4,15 +4,19 @@ com/saas/platform/entity/Employee.class
 com/saas/platform/mapper/ProductMapper.class
 com/saas/platform/dto/IntentionCustomerQuery.class
 com/saas/platform/config/SecurityConfig.class
+com/saas/platform/service/ProxyTemplateService.class
 com/saas/platform/service/IntentionCustomerService.class
 com/saas/platform/service/NodeService.class
+com/saas/platform/controller/ProxyTemplateController.class
 com/saas/platform/entity/BaseEntity.class
 com/saas/platform/dto/CustomerDTO.class
 com/saas/platform/util/IpLocationUtil.class
+com/saas/platform/controller/AfterSalesController.class
 com/saas/platform/service/impl/NodeServiceImpl.class
 com/saas/platform/controller/OrderController.class
 com/saas/platform/service/impl/CustomerServiceImpl.class
 com/saas/platform/dto/ProductQuery.class
+com/saas/platform/entity/ProxyTemplate.class
 com/saas/platform/controller/HealthController.class
 com/saas/platform/entity/Customer.class
 com/saas/platform/mapper/OrderMapper.class
@@ -32,6 +36,7 @@ com/saas/platform/service/EmployeeService.class
 com/saas/platform/mapper/IntentionCustomerMapper.class
 com/saas/platform/exception/BusinessException.class
 com/saas/platform/dto/Result.class
+com/saas/platform/mapper/ProxyTemplateMapper.class
 com/saas/platform/service/IpPoolService.class
 com/saas/platform/service/ProductService.class
 com/saas/platform/dto/TimeRangeQuery.class
@@ -62,3 +67,4 @@ com/saas/platform/mapper/CustomerMapper.class
 com/saas/platform/entity/NodeGroupMember.class
 com/saas/platform/exception/GlobalExceptionHandler.class
 com/saas/platform/entity/NodeGroup.class
+com/saas/platform/service/impl/ProxyTemplateServiceImpl.class

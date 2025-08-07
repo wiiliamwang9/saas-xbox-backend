@@ -37,18 +37,22 @@ public class CustomerController {
     /**
      * 分页查询客户列表
      */
-    @Operation(summary = "分页查询客户列表", description = "支持按客户名称、类型、VIP等级、状态等筛选")
+    @Operation(summary = "分页查询客户列表", description = "支持按客户账号、客户名称、类型、VIP等级、状态、手机号、邮箱、注册来源、客户经理等筛选")
     @GetMapping("/page")
     public Result<IPage<Customer>> getCustomerPage(
             @Parameter(description = "当前页", example = "1") @RequestParam(defaultValue = "1") Long current,
             @Parameter(description = "每页大小", example = "10") @RequestParam(defaultValue = "10") Long size,
+            @Parameter(description = "客户账号") @RequestParam(required = false) String account,
             @Parameter(description = "客户名称") @RequestParam(required = false) String customerName,
             @Parameter(description = "客户类型") @RequestParam(required = false) String customerType,
             @Parameter(description = "VIP等级") @RequestParam(required = false) String vipLevel,
             @Parameter(description = "客户状态") @RequestParam(required = false) String customerStatus,
+            @Parameter(description = "手机号") @RequestParam(required = false) String phone,
+            @Parameter(description = "邮箱") @RequestParam(required = false) String email,
+            @Parameter(description = "注册来源") @RequestParam(required = false) String registerSource,
             @Parameter(description = "客户经理ID") @RequestParam(required = false) Long managerId) {
-        IPage<Customer> page = customerService.getCustomerPage(current, size, customerName, 
-                customerType, vipLevel, customerStatus, managerId);
+        IPage<Customer> page = customerService.getCustomerPage(current, size, account, customerName, 
+                customerType, vipLevel, customerStatus, phone, email, registerSource, managerId);
         return Result.success(page);
     }
 

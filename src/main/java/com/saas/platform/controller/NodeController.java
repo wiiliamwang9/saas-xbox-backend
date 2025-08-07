@@ -129,7 +129,7 @@ public class NodeController {
     @PutMapping("/{id}")
     public Result<Boolean> updateNode(
             @Parameter(description = "节点ID", example = "1") @PathVariable @NotNull Long id,
-            @Valid @RequestBody Node node) {
+            @RequestBody Node node) {
         
         // 验证节点是否存在
         Node existingNode = nodeService.getById(id);
@@ -137,18 +137,68 @@ public class NodeController {
             return Result.error("节点不存在");
         }
 
-        // 验证节点编码唯一性（排除当前节点）
-        if (!nodeService.isNodeCodeUnique(node.getNodeCode(), id)) {
-            return Result.error("节点编码已存在");
+        // 合并更新字段，只更新非空字段
+        if (node.getNodeName() != null) {
+            existingNode.setNodeName(node.getNodeName());
         }
-        
-        // 验证服务器IP唯一性（排除当前节点）
-        if (!nodeService.isServerIpUnique(node.getServerIp(), id)) {
-            return Result.error("服务器IP已存在");
+        if (node.getNodeCode() != null) {
+            // 验证节点编码唯一性（排除当前节点）
+            if (!nodeService.isNodeCodeUnique(node.getNodeCode(), id)) {
+                return Result.error("节点编码已存在");
+            }
+            existingNode.setNodeCode(node.getNodeCode());
+        }
+        if (node.getServerIp() != null) {
+            // 验证服务器IP唯一性（排除当前节点）
+            if (!nodeService.isServerIpUnique(node.getServerIp(), id)) {
+                return Result.error("服务器IP已存在");
+            }
+            existingNode.setServerIp(node.getServerIp());
+        }
+        if (node.getCountry() != null) {
+            existingNode.setCountry(node.getCountry());
+        }
+        if (node.getRegion() != null) {
+            existingNode.setRegion(node.getRegion());
+        }
+        if (node.getSshPort() != null) {
+            existingNode.setSshPort(node.getSshPort());
+        }
+        if (node.getPassword() != null) {
+            existingNode.setPassword(node.getPassword());
+        }
+        if (node.getDomain() != null) {
+            existingNode.setDomain(node.getDomain());
+        }
+        if (node.getNodeType() != null) {
+            existingNode.setNodeType(node.getNodeType());
+        }
+        if (node.getCombinationType() != null) {
+            existingNode.setCombinationType(node.getCombinationType());
+        }
+        if (node.getRemark() != null) {
+            existingNode.setRemark(node.getRemark());
+        }
+        if (node.getAgentStatus() != null) {
+            existingNode.setAgentStatus(node.getAgentStatus());
+        }
+        if (node.getNodeStatus() != null) {
+            existingNode.setNodeStatus(node.getNodeStatus());
+        }
+        if (node.getMaxConnections() != null) {
+            existingNode.setMaxConnections(node.getMaxConnections());
+        }
+        if (node.getBandwidthMbps() != null) {
+            existingNode.setBandwidthMbps(node.getBandwidthMbps());
+        }
+        if (node.getProvider() != null) {
+            existingNode.setProvider(node.getProvider());
+        }
+        if (node.getMonthlyCost() != null) {
+            existingNode.setMonthlyCost(node.getMonthlyCost());
         }
 
-        node.setId(id);
-        boolean success = nodeService.updateNode(node);
+        boolean success = nodeService.updateNode(existingNode);
         if (success) {
             return Result.success("节点更新成功", true);
         } else {

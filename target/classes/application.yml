@@ -115,7 +115,7 @@ jwt:
 # Xbox Controller 配置
 xbox:
   controller:
-    url: http://localhost:8080
+    url: http://localhost:9000
   sync:
     enabled: true
 
