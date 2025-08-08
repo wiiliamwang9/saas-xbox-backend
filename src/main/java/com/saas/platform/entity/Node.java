@@ -49,6 +49,15 @@ public class Node extends BaseEntity {
     private String serverIp;
 
     /**
+     * SSH登录用户名
+     */
+    @Schema(description = "SSH登录用户名", example = "root")
+    @TableField("username")
+    @NotBlank(message = "SSH登录用户名不能为空")
+    @Size(max = 50, message = "SSH登录用户名长度不能超过50个字符")
+    private String username;
+
+    /**
      * 国家
      */
     @Schema(description = "国家", example = "美国")
@@ -239,6 +248,14 @@ public class Node extends BaseEntity {
 
     public void setServerIp(String serverIp) {
         this.serverIp = serverIp;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getCountry() {

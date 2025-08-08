@@ -5,7 +5,7 @@
     <!-- 节点分页查询 -->
     <select id="selectNodePage" resultType="com.saas.platform.entity.Node">
         SELECT 
-            id, node_name, node_code, server_ip, country, region,
+            id, node_name, node_code, server_ip, username, country, region,
             ssh_port, password, domain, node_type, combination_type, 
             remark, agent_status, node_status, max_connections, 
             current_connections, bandwidth_mbps, cpu_usage, memory_usage, 
@@ -31,7 +31,7 @@
     <!-- 根据节点编码查询 -->
     <select id="selectByNodeCode" resultType="com.saas.platform.entity.Node">
         SELECT 
-            id, node_name, node_code, server_ip, country, region,
+            id, node_name, node_code, server_ip, username, country, region,
             ssh_port, password, domain, node_type, combination_type, 
             remark, agent_status, node_status, max_connections, 
             current_connections, bandwidth_mbps, cpu_usage, memory_usage, 
@@ -44,7 +44,7 @@
     <!-- 根据服务器IP查询 -->
     <select id="selectByServerIp" resultType="com.saas.platform.entity.Node">
         SELECT 
-            id, node_name, node_code, server_ip, country, region,
+            id, node_name, node_code, server_ip, username, country, region,
             ssh_port, password, domain, node_type, combination_type, 
             remark, agent_status, node_status, max_connections, 
             current_connections, bandwidth_mbps, cpu_usage, memory_usage, 
@@ -57,7 +57,7 @@
     <!-- 查询运行中的节点 -->
     <select id="selectRunningNodes" resultType="com.saas.platform.entity.Node">
         SELECT 
-            id, node_name, node_code, server_ip, country, region,
+            id, node_name, node_code, server_ip, username, country, region,
             ssh_port, password, domain, node_type, combination_type, 
             remark, agent_status, node_status, max_connections, 
             current_connections, bandwidth_mbps, cpu_usage, memory_usage, 
@@ -71,7 +71,7 @@
     <!-- 按国家查询节点 -->
     <select id="selectByCountry" resultType="com.saas.platform.entity.Node">
         SELECT 
-            id, node_name, node_code, server_ip, country, region,
+            id, node_name, node_code, server_ip, username, country, region,
             ssh_port, password, domain, node_type, combination_type, 
             remark, agent_status, node_status, max_connections, 
             current_connections, bandwidth_mbps, cpu_usage, memory_usage, 
@@ -85,7 +85,7 @@
     <!-- 查询需要检查的节点 -->
     <select id="selectNeedCheckNodes" resultType="com.saas.platform.entity.Node">
         SELECT 
-            id, node_name, node_code, server_ip, country, region,
+            id, node_name, node_code, server_ip, username, country, region,
             ssh_port, password, domain, node_type, combination_type, 
             remark, agent_status, node_status, max_connections, 
             current_connections, bandwidth_mbps, cpu_usage, memory_usage, 
@@ -156,7 +156,7 @@
     <!-- 查询高负载节点 -->
     <select id="selectHighLoadNodes" resultType="com.saas.platform.entity.Node">
         SELECT 
-            id, node_name, node_code, server_ip, country, region,
+            id, node_name, node_code, server_ip, username, country, region,
             ssh_port, password, domain, node_type, combination_type, 
             remark, agent_status, node_status, max_connections, 
             current_connections, bandwidth_mbps, cpu_usage, memory_usage, 
@@ -172,7 +172,7 @@
     <!-- 查询连接数接近上限的节点 -->
     <select id="selectHighConnectionNodes" resultType="com.saas.platform.entity.Node">
         SELECT 
-            id, node_name, node_code, server_ip, country, region,
+            id, node_name, node_code, server_ip, username, country, region,
             ssh_port, password, domain, node_type, combination_type, 
             remark, agent_status, node_status, max_connections, 
             current_connections, bandwidth_mbps, cpu_usage, memory_usage, 

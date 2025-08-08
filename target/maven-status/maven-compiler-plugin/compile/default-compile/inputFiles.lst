@@ -8,6 +8,7 @@
 /root/wl/code/saas-xbox-backend/src/main/java/com/saas/platform/controller/AfterSalesController.java
 /root/wl/code/saas-xbox-backend/src/main/java/com/saas/platform/controller/CustomerController.java
 /root/wl/code/saas-xbox-backend/src/main/java/com/saas/platform/controller/EmployeeController.java
+/root/wl/code/saas-xbox-backend/src/main/java/com/saas/platform/controller/FileController.java
 /root/wl/code/saas-xbox-backend/src/main/java/com/saas/platform/controller/HealthController.java
 /root/wl/code/saas-xbox-backend/src/main/java/com/saas/platform/controller/IntentionCustomerController.java
 /root/wl/code/saas-xbox-backend/src/main/java/com/saas/platform/controller/NodeController.java

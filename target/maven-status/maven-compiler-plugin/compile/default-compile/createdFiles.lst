@@ -44,6 +44,7 @@ com/saas/platform/controller/EmployeeController.class
 com/saas/platform/entity/IpPool.class
 com/saas/platform/mapper/IpPoolMapper.class
 com/saas/platform/service/NodeGroupService.class
+com/saas/platform/controller/FileController.class
 com/saas/platform/config/SwaggerConfig.class
 com/saas/platform/dto/PageQuery.class
 com/saas/platform/service/impl/XboxSyncServiceImpl.class
